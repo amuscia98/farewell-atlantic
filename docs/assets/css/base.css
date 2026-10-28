@@ -512,3 +512,9 @@ main { flex: 1; width: 100%; }
 .day-head .theme-toggle { position: static; }
 
 noscript .locked-note { display: block; margin-top: var(--space-5); }
+
+/* Casella pubblica: niente indovinello, si apre per tutti */
+.tile.is-public { border-style: dashed; border-color: var(--border-strong); }
+.tile.is-public .tile__label { color: var(--accent); }
+.tile.is-public .tile__seal { color: var(--accent); }
+.gate > .locked-note:first-child { margin-top: 0; }

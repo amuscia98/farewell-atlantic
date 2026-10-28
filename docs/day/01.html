@@ -20,36 +20,16 @@
   <main class="day-main">
     <h1 class="sr-only">Giorno 1</h1>
 
-    <section class="gate" id="gate">
-      <p class="gate__kicker">L'indovinello</p>
-      <blockquote class="riddle">Dura tre minuti in piedi
-e risolve più problemi di una riunione da un’ora.</blockquote>
-
-      <form class="gate__form" id="gate-form" novalidate>
-        <label class="gate__label" for="answer">La risposta è la password di questa casella</label>
-        <input class="gate__input" id="answer" name="answer" type="text"
-               placeholder="scrivi la risposta"
-               autocomplete="off" autocapitalize="off" autocorrect="off"
-               spellcheck="false" enterkeyhint="go" required>
-        <button class="btn" id="gate-submit" type="submit">Apri la casella</button>
-        <p class="gate__msg" id="gate-msg" role="status" aria-live="polite"></p>
-      </form>
-
-      <details class="hint">
-        <summary>Serve un suggerimento?</summary>
-        <p>Due parole, e ci vuole una tazzina.</p>
-      </details>
-      <noscript>
-        <p class="locked-note">Per aprire questa casella serve JavaScript: il contenuto è cifrato e viene decifrato nel browser.</p>
-      </noscript>
-    </section>
+    <noscript>
+      <p class="locked-note">Per vedere questa casella serve JavaScript.</p>
+    </noscript>
 
     <article class="reveal" id="reveal" hidden></article>
   </main>
 
   <footer class="site-foot">Fatto con affetto — Alessandro</footer>
 
-  <script type="application/json" id="avvento-config">{"day":1,"dataUrl":"../data/day-01.json","dateLock":{"enabled":false,"year":2026,"month":12,"note":"Se enabled è true, una casella non si apre prima del suo giorno (ora locale del visitatore). È solo un effetto scenico: il contenuto resta cifrato in ogni caso."},"siteTitle":"Farewell Atlantic","navHtml":"\u003ca href=\"../index.html\">Calendario\u003c/a> · \u003ca href=\"02.html\">Giorno 2 →\u003c/a>"}</script>
+  <script type="application/json" id="avvento-config">{"day":1,"dataUrl":"../data/day-01.json","public":true,"dateLock":{"enabled":false,"year":2026,"month":12,"note":"Se enabled è true, una casella non si apre prima del suo giorno (ora locale del visitatore). È solo un effetto scenico: il contenuto resta cifrato in ogni caso."},"siteTitle":"Farewell Atlantic","navHtml":"\u003ca href=\"../index.html\">Calendario\u003c/a> · \u003ca href=\"02.html\">Giorno 2 →\u003c/a>"}</script>
   <script type="module">
     window.AVVENTO = JSON.parse(document.getElementById('avvento-config').textContent);
   </script>

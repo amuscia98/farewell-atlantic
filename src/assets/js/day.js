@@ -10,6 +10,7 @@ import { giornoBloccato, dataApertura } from './datelock.js';
 
 const config = window.AVVENTO ?? {};
 const day = Number(config.day);
+const pubblico = Boolean(config.public);
 
 initTheme(document.getElementById('theme-toggle'));
 
@@ -118,15 +119,44 @@ async function apri(risposta, { animazione = true, salva = true } = {}) {
   mostra(contenuto);
 }
 
+// --- Avvisi al posto del contenuto -----------------------------------------
+
+function notaGiornoPubblico(testo) {
+  // I giorni pubblici non hanno il riquadro dell'indovinello: lo creiamo
+  // solo per mostrare un avviso.
+  const riquadro = document.createElement('section');
+  riquadro.className = 'gate';
+  const nota = document.createElement('p');
+  nota.className = 'locked-note';
+  nota.textContent = testo;
+  riquadro.append(nota);
+  reveal.before(riquadro);
+}
+
+const testoBloccato = () =>
+  `Questa casella si apre il ${dataApertura(day, config.dateLock)}. Torna a trovarmi.`;
+
+// --- Giorno pubblico: si mostra e basta ------------------------------------
+
+const salvata = pubblico ? null : rispostaSalvata(day);
+
+if (pubblico) {
+  if (giornoBloccato(day, config.dateLock)) {
+    notaGiornoPubblico(testoBloccato());
+  } else {
+    bustaPromise
+      .then((busta) => mostra(busta.content ?? {}))
+      .catch((errore) => notaGiornoPubblico(`Qualcosa non va: ${errore.message}`));
+  }
+}
+
 // --- Blocco per data -------------------------------------------------------
 
-const salvata = rispostaSalvata(day);
-
-if (!salvata && giornoBloccato(day, config.dateLock)) {
+else if (!salvata && giornoBloccato(day, config.dateLock)) {
   form.hidden = true;
   const nota = document.createElement('p');
   nota.className = 'locked-note';
-  nota.textContent = `Questa casella si apre il ${dataApertura(day, config.dateLock)}. Torna a trovarmi.`;
+  nota.textContent = testoBloccato();
   gate.append(nota);
 } else if (salvata) {
   // Già risolto in passato: si apre da sé.

@@ -6,6 +6,7 @@
 //
 // In docs/ finiscono solo: HTML, CSS, JS, e per ogni giorno un JSON con
 // salt, IV e ciphertext. Testi e immagini restano dentro la busta cifrata.
+// Fanno eccezione i giorni marcati "pubblico: sì", pubblicati in chiaro.
 //
 //   node build/build.mjs
 // ---------------------------------------------------------------------------
@@ -41,6 +42,39 @@ function rendi(template, valori) {
   return template.replace(/\{\{(\w+)\}\}/g, (intero, chiave) =>
     Object.hasOwn(valori, chiave) ? String(valori[chiave]) : intero,
   );
+}
+
+function bloccoCancello(giorno) {
+  const noscript = (testo) =>
+    `      <noscript>\n        <p class="locked-note">${testo}</p>\n      </noscript>`;
+
+  if (giorno.pubblico) {
+    return `    <noscript>\n      <p class="locked-note">Per vedere questa casella serve JavaScript.</p>\n    </noscript>`;
+  }
+
+  const hint = giorno.suggerimento
+    ? `      <details class="hint">\n` +
+      `        <summary>Serve un suggerimento?</summary>\n` +
+      `        <p>${esc(giorno.suggerimento)}</p>\n` +
+      `      </details>\n`
+    : '';
+
+  return `    <section class="gate" id="gate">
+      <p class="gate__kicker">L'indovinello</p>
+      <blockquote class="riddle">${esc(giorno.indovinello)}</blockquote>
+
+      <form class="gate__form" id="gate-form" novalidate>
+        <label class="gate__label" for="answer">La risposta è la password di questa casella</label>
+        <input class="gate__input" id="answer" name="answer" type="text"
+               placeholder="scrivi la risposta"
+               autocomplete="off" autocapitalize="off" autocorrect="off"
+               spellcheck="false" enterkeyhint="go" required>
+        <button class="btn" id="gate-submit" type="submit">Apri la casella</button>
+        <p class="gate__msg" id="gate-msg" role="status" aria-live="polite"></p>
+      </form>
+
+${hint}${noscript('Per aprire questa casella serve JavaScript: il contenuto è cifrato e viene decifrato nel browser.')}
+    </section>`;
 }
 
 function kb(byte) {
@@ -86,6 +120,7 @@ async function main() {
   const righe = [];
   const presenti = [];
   const mancanti = [];
+  const pubblici = [];
 
   // --- Quali giorni hanno contenuto? ---------------------------------------
   for (let day = 1; day <= totaleGiorni; day += 1) {
@@ -101,26 +136,34 @@ async function main() {
   // --- Un giorno alla volta ------------------------------------------------
   for (const { day, dir } of presenti) {
     const giorno = await leggiGiorno(dir, day, config);
+    avvisi.push(...giorno.avvisi);
 
-    const normalizzata = normalizeAnswer(giorno.risposta);
-    if (normalizzata.length < 5 || RISPOSTE_DEBOLI.has(normalizzata)) {
-      avvisi.push(
-        `giorno ${day}: la risposta "${giorno.risposta}" è facile da indovinare. ` +
-          'Il ciphertext è pubblico, quindi si può provare offline: meglio due o tre parole.',
-      );
+    let busta;
+    if (giorno.pubblico) {
+      // Giorno pubblico: niente indovinello, contenuto in chiaro.
+      pubblici.push(day);
+      busta = { day, public: true, content: giorno.payload };
+    } else {
+      const normalizzata = normalizeAnswer(giorno.risposta);
+      if (normalizzata.length < 5 || RISPOSTE_DEBOLI.has(normalizzata)) {
+        avvisi.push(
+          `giorno ${day}: la risposta "${giorno.risposta}" è facile da indovinare. ` +
+            'Il ciphertext è pubblico, quindi si può provare offline: meglio due o tre parole.',
+        );
+      }
+
+      const { envelope } = await sealPayload(giorno.payload, giorno.risposta, {
+        iterations: Number(config.crypto.iterations) || 310000,
+        compress: config.crypto.compress !== false,
+      });
+
+      busta = {
+        day,
+        riddle: giorno.indovinello,
+        hint: giorno.suggerimento,
+        ...envelope,
+      };
     }
-
-    const { envelope, stats } = await sealPayload(giorno.payload, giorno.risposta, {
-      iterations: Number(config.crypto.iterations) || 310000,
-      compress: config.crypto.compress !== false,
-    });
-
-    const busta = {
-      day,
-      riddle: giorno.indovinello,
-      hint: giorno.suggerimento,
-      ...envelope,
-    };
 
     const nomeDati = `day-${dueCifre(day)}.json`;
     await writeFile(path.join(DOCS, 'data', nomeDati), JSON.stringify(busta));
@@ -137,17 +180,11 @@ async function main() {
     const configPagina = {
       day,
       dataUrl: `../data/${nomeDati}`,
+      public: giorno.pubblico,
       dateLock: config.dateLock,
       siteTitle: config.site.title,
       navHtml: navParti.join(' · '),
     };
-
-    const hint = giorno.suggerimento
-      ? `      <details class="hint">\n` +
-        `        <summary>Serve un suggerimento?</summary>\n` +
-        `        <p>${esc(giorno.suggerimento)}</p>\n` +
-        `      </details>`
-      : '';
 
     await writeFile(
       path.join(DOCS, 'day', `${dueCifre(day)}.html`),
@@ -156,15 +193,14 @@ async function main() {
         title: esc(config.site.title),
         day: String(day),
         badge: esc(`${day} ${nomeMese(config.dateLock?.month || 12)}`),
-        riddle: esc(giorno.indovinello),
-        hint,
+        gate: bloccoCancello(giorno),
         footer: esc(config.site.footer || ''),
         configJson: JSON.stringify(configPagina).replace(/</g, '\\u003c'),
       }),
     );
 
     const dimensione = (await stat(path.join(DOCS, 'data', nomeDati))).size;
-    righe.push({ day, dimensione, ...giorno.stats, risparmio: stats.plainSize });
+    righe.push({ day, dimensione, pubblico: giorno.pubblico, ...giorno.stats });
 
     if (dimensione > 4 * 1024 * 1024) {
       avvisi.push(
@@ -187,11 +223,13 @@ async function main() {
       );
       continue;
     }
+    const pubblico = pubblici.includes(day);
     caselle.push(
-      `      <li><a class="tile" href="day/${dueC}.html" data-day="${day}">` +
-        `<span class="tile__seal" aria-hidden="true"></span>` +
+      `      <li><a class="tile${pubblico ? ' is-public' : ''}" href="day/${dueC}.html" data-day="${day}"` +
+        `${pubblico ? ' data-public="true"' : ''}>` +
+        `<span class="tile__seal" aria-hidden="true">${pubblico ? '○' : ''}</span>` +
         `<span class="tile__num">${day}</span>` +
-        `<span class="tile__label">dicembre</span></a></li>`,
+        `<span class="tile__label">${pubblico ? 'libera' : 'dicembre'}</span></a></li>`,
     );
   }
 
@@ -208,24 +246,31 @@ async function main() {
       configJson: JSON.stringify({
         dateLock: config.dateLock,
         days: totaleGiorni,
+        publicDays: pubblici,
       }).replace(/</g, '\\u003c'),
     }),
   );
 
   // --- Resoconto -----------------------------------------------------------
   console.log(`\n  ${config.site.title} — build completata\n`);
-  console.log('  giorno   busta      immagini   video');
-  console.log('  ' + '-'.repeat(42));
+  console.log('  giorno   tipo        busta      immagini   video');
+  console.log('  ' + '-'.repeat(54));
   for (const riga of righe) {
     console.log(
-      `  ${String(riga.day).padStart(4)}   ${kb(riga.dimensione).padStart(9)}` +
-        `   ${String(riga.immagini).padStart(8)}   ${String(riga.video).padStart(5)}`,
+      `  ${String(riga.day).padStart(4)}   ${(riga.pubblico ? 'pubblico' : 'cifrato').padEnd(8)}` +
+        `${kb(riga.dimensione).padStart(9)}   ${String(riga.immagini).padStart(8)}   ${String(riga.video).padStart(5)}`,
     );
   }
 
   const totale = righe.reduce((n, r) => n + r.dimensione, 0);
-  console.log('  ' + '-'.repeat(42));
-  console.log(`  ${righe.length} giorni cifrati, ${kb(totale)} in tutto`);
+  console.log('  ' + '-'.repeat(54));
+  console.log(
+    `  ${righe.length - pubblici.length} giorni cifrati` +
+      (pubblici.length
+        ? `, ${pubblici.length} ${pubblici.length === 1 ? 'pubblico' : 'pubblici'} (${pubblici.join(', ')})`
+        : '') +
+      `, ${kb(totale)} in tutto`,
+  );
   if (mancanti.length) {
     console.log(`  giorni ancora senza contenuto: ${mancanti.join(', ')}`);
   }

@@ -12,8 +12,11 @@ const config = window.AVVENTO ?? {};
 
 initTheme(document.getElementById('theme-toggle'));
 
-const aperti = new Set(giorniAperti());
 const caselle = Array.from(document.querySelectorAll('[data-day]'));
+// Le caselle pubbliche non hanno indovinello: sono aperte per tutti e non
+// contano nel progresso.
+const conIndovinello = caselle.filter((c) => !c.dataset.public).map((c) => Number(c.dataset.day));
+const aperti = new Set(giorniAperti().filter((d) => conIndovinello.includes(d)));
 
 // Casella appena sbloccata: la segnaliamo con un guizzo al ritorno dalla
 // pagina del giorno.
@@ -39,6 +42,7 @@ for (const casella of caselle) {
   }
 
   if (giornoBloccato(day, config.dateLock)) {
+    casella.classList.remove('is-public');
     casella.classList.add('is-locked');
     casella.setAttribute('aria-disabled', 'true');
     casella.title = `Si apre il ${dataApertura(day, config.dateLock)}`;
@@ -52,13 +56,14 @@ for (const casella of caselle) {
 
 const progresso = document.getElementById('progress');
 if (progresso) {
-  const totale = caselle.length;
+  const totale = conIndovinello.length;
   const n = aperti.size;
 
   let testo;
-  if (n === 0) testo = `Nessuna casella aperta, per ora. ${totale} ti aspettano.`;
-  else if (n === totale) testo = `Tutte e ${totale} le caselle sono aperte. Grazie di essere arrivato fino in fondo.`;
-  else testo = `${n} ${n === 1 ? 'casella aperta' : 'caselle aperte'} su ${totale}.`;
+  if (totale === 0) testo = '';
+  else if (n === 0) testo = `Nessun indovinello risolto, per ora. ${totale === 1 ? 'Uno ti aspetta' : `${totale} ti aspettano`}.`;
+  else if (n === totale) testo = `Tutti gli indovinelli risolti. Grazie di essere arrivato fino in fondo.`;
+  else testo = `${n} ${n === 1 ? 'indovinello risolto' : 'indovinelli risolti'} su ${totale}.`;
 
   progresso.textContent = testo;
 

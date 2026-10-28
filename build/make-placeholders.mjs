@@ -18,7 +18,7 @@ const CONTENT = path.join(RADICE, 'content');
 const FORZA = process.argv.includes('--force');
 
 const GIORNI = [
-  { titolo: 'La pausa di metà mattina', indovinello: 'Dura tre minuti in piedi\ne risolve più problemi di una riunione da un’ora.', risposta: 'pausa caffè', suggerimento: 'Due parole, e ci vuole una tazzina.' },
+  { titolo: 'Benvenuti nel calendario', pubblico: true },
   { titolo: 'Il lunedì mattina', indovinello: 'Comincia sempre con «mi sentite?»\ne finisce dieci minuti oltre l’ora.', risposta: 'call del lunedì', suggerimento: 'Succede a inizio settimana.' },
   { titolo: 'La stanza con il nome di una città', indovinello: 'Ha quattro pareti, un proiettore che non si collega mai\ne il nome di un posto dove nessuno è stato.', risposta: 'sala riunioni', suggerimento: 'Si prenota, e c’è sempre occupata.' },
   { titolo: 'Quello che cerchi nelle tasche', indovinello: 'Senza di lui resti fuori,\ncon lui entri ovunque.', risposta: 'badge aziendale', suggerimento: 'Si appende al collo.' },
@@ -80,22 +80,40 @@ async function esiste(percorso) {
   }
 }
 
+function corpoPresentazione() {
+  return `Ciao a tutti, e benvenuti. Questo è un testo segnaposto per la casella di apertura: **è pubblica**, non ha indovinello, e serve a spiegare il gioco. Sostituiscilo con le tue parole.
+
+## Come funziona
+
+- da domani, ogni giorno di dicembre si apre una nuova casella;
+- dietro ogni casella c'è un **indovinello**: la risposta è la password;
+- maiuscole, accenti e spazi non contano: \`Caffè\` e \`caffe\` vanno bene uguale;
+- se vi bloccate, sotto l'indovinello c'è un suggerimento;
+- le caselle che aprite restano aperte su questo dispositivo.
+
+## Cosa troverete
+
+Dediche, foto, qualche video, e un po' di ricordi di questi anni insieme.
+
+![Benvenuti nel calendario](img/segnaposto.jpg "Didascalia di esempio")
+
+Buon divertimento — e grazie.
+`;
+}
+
 function corpo(day, dati) {
   const extra =
     day === 25
-      ? `\nUn video si aggiunge così: basta incollare il link su una riga da solo,\noppure metterlo nel front-matter sotto \`video:\`. Finisce dentro la parte\ncifrata, quindi il link non è leggibile da chi non risolve l'indovinello.\n`
+      ? `\nUn video si aggiunge così: basta incollare il link su una riga da solo, oppure metterlo nel front-matter sotto \`video:\`. Finisce dentro la parte cifrata, quindi il link non è leggibile da chi non risolve l'indovinello.\n`
       : '';
 
-  return `Questo è un testo segnaposto per il **giorno ${day}**: sostituiscilo con la tua
-dedica. Puoi usare il *Markdown* che ti serve — grassetto, corsivo, elenchi,
-citazioni, titoli.
+  return `Questo è un testo segnaposto per il **giorno ${day}**: sostituiscilo con la tua dedica. Puoi usare il *Markdown* che ti serve — grassetto, corsivo, elenchi, citazioni, titoli.
 
 > Una citazione, se ti va: le cose belle di questo posto sono state le persone.
 
 ![${dati.titolo}](img/segnaposto.jpg "Didascalia di esempio — il testo fra virgolette diventa la didascalia")
 
-Le immagini vanno in \`img/\` dentro questa cartella: la build le ridimensiona,
-le comprime e le incorpora **dentro il pacchetto cifrato**, mai in chiaro.
+Le immagini vanno in \`img/\` dentro questa cartella: la build le ridimensiona, le comprime e le incorpora **dentro il pacchetto cifrato**, mai in chiaro.
 ${extra}`;
 }
 
@@ -115,7 +133,16 @@ async function main() {
 
     await mkdir(path.join(dir, 'img'), { recursive: true });
 
-    const testo = `---
+    const testo = dati.pubblico
+      ? `---
+titolo: ${dati.titolo}
+# Casella pubblica: si apre per tutti, senza indovinello né password.
+# ATTENZIONE: il contenuto viene pubblicato IN CHIARO nel repository.
+pubblico: sì
+---
+
+${corpoPresentazione()}`
+      : `---
 titolo: ${dati.titolo}
 indovinello: |
 ${dati.indovinello.split('\n').map((riga) => `  ${riga}`).join('\n')}

@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
 // Dal materiale in chiaro di content/day-NN/ al pacchetto da cifrare.
 //
-// - front-matter: indovinello, risposta, suggerimento, titolo, video
+// - front-matter: indovinello, risposta, suggerimento, titolo, video, pubblico
 // - corpo Markdown -> HTML
 // - immagini: ridimensionate, compresse e incorporate come data URL
 //   (così non finiscono mai in chiaro in docs/)
@@ -21,7 +21,11 @@ const ALIAS = {
   risposta: ['risposta', 'answer', 'password'],
   suggerimento: ['suggerimento', 'hint', 'aiuto'],
   video: ['video', 'videos', 'filmato', 'filmati'],
+  pubblico: ['pubblico', 'pubblica', 'public'],
 };
+
+const VERO = new Set(['si', 'sì', 'true', 'yes', '1', 'vero']);
+const FALSO = new Set(['no', 'false', '0', 'falso']);
 
 function campo(dati, nome) {
   for (const alias of ALIAS[nome]) {
@@ -186,9 +190,37 @@ export async function leggiGiorno(dir, day, config) {
 
   const indovinello = campo(dati, 'indovinello');
   const risposta = campo(dati, 'risposta');
+  const avvisi = [];
 
-  if (!indovinello) throw new Error(`giorno ${day}: manca "indovinello:" nel front-matter`);
-  if (!risposta) throw new Error(`giorno ${day}: manca "risposta:" nel front-matter`);
+  // Un giorno è pubblico solo se lo dice esplicitamente: una risposta
+  // dimenticata non deve mai far finire una dedica in chiaro nel repository.
+  let pubblico = false;
+  const valorePubblico = campo(dati, 'pubblico');
+  if (valorePubblico !== undefined) {
+    const v = String(valorePubblico).trim().toLowerCase();
+    if (VERO.has(v)) pubblico = true;
+    else if (!FALSO.has(v)) {
+      throw new Error(`giorno ${day}: "pubblico: ${valorePubblico}" non è chiaro, scrivi "pubblico: sì" oppure "pubblico: no"`);
+    }
+  }
+
+  if (pubblico) {
+    if (risposta) {
+      throw new Error(
+        `giorno ${day}: ha sia "pubblico: sì" sia una risposta. Decidi: ` +
+          'togli la risposta per renderlo pubblico, oppure togli "pubblico" per cifrarlo.',
+      );
+    }
+    if (indovinello) avvisi.push(`giorno ${day}: è pubblico, quindi l'indovinello viene ignorato`);
+  } else {
+    if (!risposta) {
+      throw new Error(
+        `giorno ${day}: manca "risposta:" nel front-matter. ` +
+          'Se questo giorno deve essere visibile a tutti senza password, scrivi "pubblico: sì".',
+      );
+    }
+    if (!indovinello) throw new Error(`giorno ${day}: manca "indovinello:" nel front-matter`);
+  }
 
   const { markdown, embeds } = estraiVideoDalCorpo(corpo);
 
@@ -205,9 +237,11 @@ export async function leggiGiorno(dir, day, config) {
 
   return {
     day,
-    indovinello: String(indovinello).trim(),
-    suggerimento: campo(dati, 'suggerimento') ? String(campo(dati, 'suggerimento')).trim() : '',
-    risposta: String(risposta),
+    pubblico,
+    avvisi,
+    indovinello: pubblico ? '' : String(indovinello).trim(),
+    suggerimento: !pubblico && campo(dati, 'suggerimento') ? String(campo(dati, 'suggerimento')).trim() : '',
+    risposta: pubblico ? '' : String(risposta),
     payload: {
       titolo: campo(dati, 'titolo') ? String(campo(dati, 'titolo')).trim() : '',
       html,

@@ -31,7 +31,9 @@ content/          →   npm run build   →   docs/
   Web Crypto API. Niente server, niente chiavi nel codice.
 
 In chiaro, nelle pagine pubblicate, restano soltanto: il numero del giorno,
-l'indovinello e l'eventuale suggerimento.
+l'indovinello e l'eventuale suggerimento. Fanno eccezione i giorni che decidi
+di rendere [pubblici](#giorni-pubblici-senza-password), che non hanno né
+indovinello né cifratura.
 
 ### Quanto è sicuro davvero
 
@@ -111,6 +113,7 @@ Il blocco fra `---` è il front-matter:
 | `titolo` | no | titolo mostrato dopo l'apertura (sta dentro la parte cifrata) |
 | `suggerimento` | no | nascosto dietro "Serve un suggerimento?", in chiaro |
 | `video` | no | elenco di link YouTube o Vimeo |
+| `pubblico` | no | `sì` per un giorno senza indovinello e senza password, vedi sotto |
 
 ### Immagini
 
@@ -136,6 +139,38 @@ I video **non vanno messi nel repository**. Caricali su YouTube come
 Il link finisce dentro la parte cifrata, quindi chi non risolve l'indovinello non
 lo vede nemmeno. Resta però un video raggiungibile da chi ha l'URL: "non in
 elenco" vuol dire nascosto, non privato.
+
+### Giorni pubblici (senza password)
+
+Non tutte le caselle devono avere un indovinello. Un giorno con
+`pubblico: sì` si apre per tutti, direttamente:
+
+```markdown
+---
+titolo: Benvenuti nel calendario
+pubblico: sì
+---
+
+Ciao a tutti! Ecco come funziona il calendario…
+```
+
+Nei segnaposto è così il **giorno 1**, pensato per presentare il gioco. Sulla
+home la casella ha il bordo tratteggiato e l'etichetta "libera", e non conta
+nel progresso ("3 indovinelli risolti su 24").
+
+**Il contenuto di un giorno pubblico finisce in chiaro nel repository**, immagini
+comprese: chiunque guardi il codice su GitHub lo può leggere. Mettici solo
+quello che va bene così.
+
+Per sicurezza la regola è esplicita:
+
+- un giorno senza `risposta` e senza `pubblico: sì` **blocca la build**: una
+  risposta dimenticata non diventa mai una dedica pubblicata in chiaro;
+- un giorno con `pubblico: sì` **e** una `risposta` blocca la build: devi
+  decidere tu quale delle due;
+- su un giorno pubblico `indovinello` e `suggerimento` vengono ignorati.
+
+Il blocco per data vale anche per i giorni pubblici.
 
 ### Un giorno alla volta
 
@@ -231,7 +266,7 @@ tutto in `docs/`.
 config.json           impostazioni del sito
 content/              materiale in chiaro — IN .gitignore, mai committato
   day-01/
-    day.md            front-matter (indovinello, risposta…) + testo Markdown
+    day.md            front-matter (indovinello, risposta… o pubblico) + testo Markdown
     img/              immagini originali
 build/
   build.mjs           la build: legge content/, cifra, genera docs/
@@ -255,6 +290,12 @@ se lo cambi, rilancia la build, altrimenti le risposte non combaciano più.
 ## Se qualcosa non va
 
 **"la cartella content/ non esiste"** — `npm run placeholders`.
+
+**"manca "risposta:" nel front-matter"** — aggiungi la risposta, oppure scrivi
+`pubblico: sì` se quel giorno deve essere visibile a tutti.
+
+**Una build fallita lascia `docs/` a metà** — la build ricrea `docs/` da zero,
+quindi se si ferma per un errore non committare: correggi e rilancia.
 
 **Una casella non si apre con la risposta giusta** — hai rilanciato `npm run
 build` dopo aver cambiato la risposta? Le buste vecchie contengono la risposta

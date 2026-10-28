@@ -23,7 +23,7 @@
 
   <main>
     <ol class="calendar">
-      <li><a class="tile" href="day/01.html" data-day="1"><span class="tile__seal" aria-hidden="true"></span><span class="tile__num">1</span><span class="tile__label">dicembre</span></a></li>
+      <li><a class="tile is-public" href="day/01.html" data-day="1" data-public="true"><span class="tile__seal" aria-hidden="true">○</span><span class="tile__num">1</span><span class="tile__label">libera</span></a></li>
       <li><a class="tile" href="day/02.html" data-day="2"><span class="tile__seal" aria-hidden="true"></span><span class="tile__num">2</span><span class="tile__label">dicembre</span></a></li>
       <li><a class="tile" href="day/03.html" data-day="3"><span class="tile__seal" aria-hidden="true"></span><span class="tile__num">3</span><span class="tile__label">dicembre</span></a></li>
       <li><a class="tile" href="day/04.html" data-day="4"><span class="tile__seal" aria-hidden="true"></span><span class="tile__num">4</span><span class="tile__label">dicembre</span></a></li>
@@ -57,7 +57,7 @@
 
   <footer class="site-foot">Fatto con affetto — Alessandro</footer>
 
-  <script type="application/json" id="avvento-config">{"dateLock":{"enabled":false,"year":2026,"month":12,"note":"Se enabled è true, una casella non si apre prima del suo giorno (ora locale del visitatore). È solo un effetto scenico: il contenuto resta cifrato in ogni caso."},"days":25}</script>
+  <script type="application/json" id="avvento-config">{"dateLock":{"enabled":false,"year":2026,"month":12,"note":"Se enabled è true, una casella non si apre prima del suo giorno (ora locale del visitatore). È solo un effetto scenico: il contenuto resta cifrato in ogni caso."},"days":25,"publicDays":[1]}</script>
   <script type="module">
     window.AVVENTO = JSON.parse(document.getElementById('avvento-config').textContent);
   </script>
