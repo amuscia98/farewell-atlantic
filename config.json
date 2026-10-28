@@ -1,0 +1,26 @@
+{
+  "site": {
+    "title": "Farewell Atlantic",
+    "eyebrow": "Atlantic Technologies",
+    "subtitle": "Venticinque giorni, venticinque ricordi",
+    "intro": "Un calendario dell'avvento per i miei anni in Atlantic Technologies. Ogni casella custodisce una dedica: per aprirla serve la risposta all'indovinello.",
+    "footer": "Fatto con affetto — Alessandro",
+    "lang": "it"
+  },
+  "days": 25,
+  "dateLock": {
+    "enabled": false,
+    "year": 2026,
+    "month": 12,
+    "note": "Se enabled è true, una casella non si apre prima del suo giorno (ora locale del visitatore). È solo un effetto scenico: il contenuto resta cifrato in ogni caso."
+  },
+  "crypto": {
+    "iterations": 310000,
+    "compress": true
+  },
+  "images": {
+    "maxWidth": 1400,
+    "quality": 72,
+    "format": "webp"
+  }
+}

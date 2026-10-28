@@ -1,0 +1,20 @@
+{
+  "name": "farewell-atlantic",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Calendario dell'avvento cifrato: tributo agli anni in Atlantic Technologies",
+  "scripts": {
+    "build": "node build/build.mjs",
+    "preview": "node build/serve.mjs",
+    "dev": "node build/build.mjs && node build/serve.mjs",
+    "placeholders": "node build/make-placeholders.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "marked": "^18.1.2",
+    "sharp": "^0.35.5"
+  }
+}

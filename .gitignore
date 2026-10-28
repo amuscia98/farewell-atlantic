@@ -1,0 +1,17 @@
+# ---------------------------------------------------------------------------
+# Materiale in chiaro: NON deve mai finire in un repository pubblico.
+# Qui dentro stanno testi, risposte agli indovinelli e immagini originali.
+# ---------------------------------------------------------------------------
+content/
+
+# Dipendenze della build
+node_modules/
+
+# Configurazione locale di Claude Code (percorsi di questo computer)
+.claude/
+
+# macOS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/

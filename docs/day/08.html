@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Giorno 8 — Farewell Atlantic</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="dark light">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+</head>
+<body>
+  <header class="day-head">
+    <a class="back" href="../index.html">← Tutte le caselle</a>
+    <p class="day-badge">8 dicembre</p>
+    <button class="theme-toggle" id="theme-toggle" type="button" hidden></button>
+  </header>
+
+  <main class="day-main">
+    <h1 class="sr-only">Giorno 8</h1>
+
+    <section class="gate" id="gate">
+      <p class="gate__kicker">L'indovinello</p>
+      <blockquote class="riddle">Funziona per giorni,
+tranne nel momento in cui guardano tutti.</blockquote>
+
+      <form class="gate__form" id="gate-form" novalidate>
+        <label class="gate__label" for="answer">La risposta è la password di questa casella</label>
+        <input class="gate__input" id="answer" name="answer" type="text"
+               placeholder="scrivi la risposta"
+               autocomplete="off" autocapitalize="off" autocorrect="off"
+               spellcheck="false" enterkeyhint="go" required>
+        <button class="btn" id="gate-submit" type="submit">Apri la casella</button>
+        <p class="gate__msg" id="gate-msg" role="status" aria-live="polite"></p>
+      </form>
+
+      <details class="hint">
+        <summary>Serve un suggerimento?</summary>
+        <p>Succede davanti a chi paga.</p>
+      </details>
+      <noscript>
+        <p class="locked-note">Per aprire questa casella serve JavaScript: il contenuto è cifrato e viene decifrato nel browser.</p>
+      </noscript>
+    </section>
+
+    <article class="reveal" id="reveal" hidden></article>
+  </main>
+
+  <footer class="site-foot">Fatto con affetto — Alessandro</footer>
+
+  <script type="application/json" id="avvento-config">{"day":8,"dataUrl":"../data/day-08.json","dateLock":{"enabled":false,"year":2026,"month":12,"note":"Se enabled è true, una casella non si apre prima del suo giorno (ora locale del visitatore). È solo un effetto scenico: il contenuto resta cifrato in ogni caso."},"siteTitle":"Farewell Atlantic","navHtml":"\u003ca href=\"07.html\">← Giorno 7\u003c/a> · \u003ca href=\"../index.html\">Calendario\u003c/a> · \u003ca href=\"09.html\">Giorno 9 →\u003c/a>"}</script>
+  <script type="module">
+    window.AVVENTO = JSON.parse(document.getElementById('avvento-config').textContent);
+  </script>
+  <script type="module" src="../assets/js/day.js"></script>
+</body>
+</html>

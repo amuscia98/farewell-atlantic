@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Giorno {{day}} — {{title}}</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="dark light">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+  <link rel="stylesheet" href="../assets/css/base.css">
+</head>
+<body>
+  <header class="day-head">
+    <a class="back" href="../index.html">← Tutte le caselle</a>
+    <p class="day-badge">{{badge}}</p>
+    <button class="theme-toggle" id="theme-toggle" type="button" hidden></button>
+  </header>
+
+  <main class="day-main">
+    <h1 class="sr-only">Giorno {{day}}</h1>
+
+    <section class="gate" id="gate">
+      <p class="gate__kicker">L'indovinello</p>
+      <blockquote class="riddle">{{riddle}}</blockquote>
+
+      <form class="gate__form" id="gate-form" novalidate>
+        <label class="gate__label" for="answer">La risposta è la password di questa casella</label>
+        <input class="gate__input" id="answer" name="answer" type="text"
+               placeholder="scrivi la risposta"
+               autocomplete="off" autocapitalize="off" autocorrect="off"
+               spellcheck="false" enterkeyhint="go" required>
+        <button class="btn" id="gate-submit" type="submit">Apri la casella</button>
+        <p class="gate__msg" id="gate-msg" role="status" aria-live="polite"></p>
+      </form>
+
+{{hint}}
+      <noscript>
+        <p class="locked-note">Per aprire questa casella serve JavaScript: il contenuto è cifrato e viene decifrato nel browser.</p>
+      </noscript>
+    </section>
+
+    <article class="reveal" id="reveal" hidden></article>
+  </main>
+
+  <footer class="site-foot">{{footer}}</footer>
+
+  <script type="application/json" id="avvento-config">{{configJson}}</script>
+  <script type="module">
+    window.AVVENTO = JSON.parse(document.getElementById('avvento-config').textContent);
+  </script>
+  <script type="module" src="../assets/js/day.js"></script>
+</body>
+</html>
