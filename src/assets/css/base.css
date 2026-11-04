@@ -459,6 +459,124 @@ main { flex: 1; width: 100%; }
   border-radius: var(--radius-sm);
 }
 
+/* Foto più piccola: ![..](img/foto.jpg#piccola) */
+.reveal__body figure.foto--piccola {
+  width: min(100%, var(--photo-small-width));
+  margin-inline: auto;
+}
+
+/* Cornice natalizia: ![..](img/foto.jpg#cornice)
+   Bordo a righe da bastoncino di zucchero, cartoncino chiaro, una stella
+   in cima e una leggera inclinazione da foto appoggiata. */
+.reveal__body figure.foto--cornice {
+  position: relative;
+  width: min(100%, var(--frame-width));
+  margin: var(--space-7) auto var(--space-5);
+  padding: var(--frame-mat-space) var(--frame-mat-space) calc(var(--frame-mat-space) * 2.5);
+  border: var(--frame-border) solid transparent;
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(var(--frame-mat), var(--frame-mat)) padding-box,
+    repeating-linear-gradient(
+      -45deg,
+      var(--frame-stripe-a) 0 var(--frame-stripe),
+      var(--frame-stripe-b) var(--frame-stripe) calc(var(--frame-stripe) * 2)
+    ) border-box;
+  box-shadow: var(--shadow-md);
+  transform: rotate(var(--frame-tilt));
+  transition: transform var(--dur-slow) var(--ease-spring);
+}
+.reveal__body figure.foto--cornice:hover { transform: rotate(0deg) scale(1.02); }
+
+.reveal__body figure.foto--cornice::before {
+  content: '★';
+  position: absolute;
+  top: calc(var(--frame-border) * -1);
+  left: 50%;
+  transform: translate(-50%, -55%);
+  font-size: 2.25rem;
+  line-height: 1;
+  color: var(--frame-star);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.reveal__body figure.foto--cornice img {
+  border-radius: 2px;
+  box-shadow: none;
+}
+
+.reveal__body figure.foto--cornice figcaption {
+  margin-top: var(--space-3);
+  font-family: var(--font-hand);
+  font-size: var(--text-lg);
+  color: var(--frame-caption);
+}
+
+/* --- Foto a schermo intero ---------------------------------------------- */
+
+.reveal__body img.is-zoomable { cursor: zoom-in; }
+
+html:has(.lightbox[open]) { overflow: hidden; }
+
+.lightbox {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: var(--space-6) var(--space-4);
+  border: 0;
+  background: var(--lightbox-bg);
+  color: #eceff5;
+  cursor: zoom-out;
+}
+.lightbox[open] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  animation: lightbox-in var(--dur-base) var(--ease-out);
+}
+.lightbox::backdrop { background: transparent; }
+
+@keyframes lightbox-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lightbox__img {
+  max-width: 100%;
+  max-height: calc(100dvh - 7rem);
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  animation: reveal-in var(--dur-slow) var(--ease-out);
+}
+
+.lightbox__caption {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: #c9cfda;
+  text-align: center;
+}
+
+.lightbox__close {
+  position: fixed;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 2.75rem;
+  height: 2.75rem;
+  font: inherit;
+  font-size: var(--text-lg);
+  color: #eceff5;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+.lightbox__close:hover { background: rgba(255, 255, 255, 0.2); }
+
 .embed {
   position: relative;
   aspect-ratio: 16 / 9;

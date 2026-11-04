@@ -70,6 +70,27 @@ function estraiVideoDalCorpo(markdown) {
 
 // --- Immagini --------------------------------------------------------------
 
+// Opzioni di stile scritte in fondo al percorso: ![foto](img/foto.jpg#cornice)
+const STILI = {
+  piccola: { classe: 'foto--piccola', maxWidth: 900 },
+  cornice: { classe: 'foto--cornice', maxWidth: 900 },
+};
+
+function leggiStili(src) {
+  const indice = src.indexOf('#');
+  if (indice === -1) return { percorso: src, stili: [] };
+  const parole = src.slice(indice + 1).split(/[+,\s]+/).filter(Boolean);
+  for (const parola of parole) {
+    if (!STILI[parola]) {
+      throw new Error(
+        `stile immagine "#${parola}" sconosciuto in "${src}". Quelli disponibili: ` +
+          Object.keys(STILI).map((k) => `#${k}`).join(', '),
+      );
+    }
+  }
+  return { percorso: src.slice(0, indice), stili: parole.map((p) => STILI[p]) };
+}
+
 const ESTENSIONI = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif', '.tif', '.tiff', '.heic', '.heif']);
 
 async function comprimi(file, { maxWidth, quality, format }) {
@@ -99,12 +120,18 @@ function decodeEntita(valore) {
     .replace(/&gt;/g, '>');
 }
 
-/** `<p><img ...></p>` diventa una `<figure>`, con didascalia se c'è il title. */
+/**
+ * `<p><img ...></p>` diventa una `<figure>`, con didascalia se c'è il title
+ * e con le classi degli stili scritti dopo il # (#cornice, #piccola).
+ */
 function avvolgiFigure(html) {
   return html.replace(/<p>(<img\b[^>]*>)<\/p>/g, (_, img) => {
     const title = /\btitle="([^"]*)"/.exec(img);
+    const src = /\bsrc="([^"]*)"/.exec(img);
+    const classi = src ? leggiStili(decodeEntita(src[1])).stili.map((s) => s.classe) : [];
     const didascalia = title ? `<figcaption>${title[1]}</figcaption>` : '';
-    return `<figure>${img}${didascalia}</figure>`;
+    const attributo = classi.length ? ` class="${classi.join(' ')}"` : '';
+    return `<figure${attributo}>${img}${didascalia}</figure>`;
   });
 }
 
@@ -114,10 +141,13 @@ async function incorporaImmagini(html, dir, opzioni) {
   let contate = 0;
 
   for (const sorgente of new Set(sorgenti)) {
-    const grezza = decodeEntita(sorgente);
+    const { percorso: grezza, stili } = leggiStili(decodeEntita(sorgente));
     if (/^(https?:|data:)/i.test(grezza)) continue;
 
-    let dataUrl = cache.get(grezza);
+    // Le foto piccole o in cornice non serve tenerle a piena risoluzione.
+    const maxWidth = Math.min(opzioni.maxWidth, ...stili.map((s) => s.maxWidth));
+    const chiave = `${grezza}@${maxWidth}`;
+    let dataUrl = cache.get(chiave);
     if (!dataUrl) {
       const file = path.resolve(dir, grezza.replace(/^\.\//, ''));
       if (!file.startsWith(path.resolve(dir))) {
@@ -131,7 +161,7 @@ async function incorporaImmagini(html, dir, opzioni) {
 
       let compressa;
       try {
-        compressa = await comprimi(file, opzioni);
+        compressa = await comprimi(file, { ...opzioni, maxWidth });
       } catch (errore) {
         const presenti = await elencaImmagini(dir);
         throw new Error(
@@ -141,7 +171,7 @@ async function incorporaImmagini(html, dir, opzioni) {
       }
 
       dataUrl = `data:${compressa.mime};base64,${compressa.buffer.toString('base64')}`;
-      cache.set(grezza, dataUrl);
+      cache.set(chiave, dataUrl);
       contate += 1;
     }
 

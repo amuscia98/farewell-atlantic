@@ -54,6 +54,68 @@ function iframeEmbed(embed) {
   return wrapper;
 }
 
+// --- Foto a schermo intero -----------------------------------------------
+// Ogni foto del contenuto si ingrandisce con un clic (o Invio da tastiera).
+// Si chiude con un altro clic, con il pulsante ✕ o con Esc.
+
+let lightbox = null;
+
+function preparaLightbox() {
+  if (lightbox) return lightbox;
+
+  lightbox = document.createElement('dialog');
+  lightbox.className = 'lightbox';
+  lightbox.setAttribute('aria-label', 'Foto a schermo intero');
+
+  const chiudi = document.createElement('button');
+  chiudi.type = 'button';
+  chiudi.className = 'lightbox__close';
+  chiudi.setAttribute('aria-label', 'Chiudi');
+  chiudi.textContent = '✕';
+
+  const img = document.createElement('img');
+  img.className = 'lightbox__img';
+
+  const didascalia = document.createElement('p');
+  didascalia.className = 'lightbox__caption';
+
+  lightbox.append(chiudi, img, didascalia);
+  lightbox.addEventListener('click', () => lightbox.close());
+  document.body.append(lightbox);
+  return lightbox;
+}
+
+function ingrandisci(foto) {
+  const dialogo = preparaLightbox();
+  const img = dialogo.querySelector('.lightbox__img');
+  const didascalia = dialogo.querySelector('.lightbox__caption');
+
+  img.src = foto.currentSrc || foto.src;
+  img.alt = foto.alt;
+  const testo = foto.closest('figure')?.querySelector('figcaption')?.textContent ?? '';
+  didascalia.textContent = testo;
+  didascalia.hidden = !testo;
+
+  dialogo.showModal();
+}
+
+function rendiIngrandibili(corpo) {
+  for (const foto of corpo.querySelectorAll('img')) {
+    if (foto.closest('a')) continue; // una foto-link resta un link
+    foto.classList.add('is-zoomable');
+    foto.tabIndex = 0;
+    foto.setAttribute('role', 'button');
+    foto.setAttribute('aria-label', `Ingrandisci${foto.alt ? `: ${foto.alt}` : ' la foto'}`);
+    foto.addEventListener('click', () => ingrandisci(foto));
+    foto.addEventListener('keydown', (evento) => {
+      if (evento.key === 'Enter' || evento.key === ' ') {
+        evento.preventDefault();
+        ingrandisci(foto);
+      }
+    });
+  }
+}
+
 function mostra(contenuto) {
   reveal.replaceChildren();
 
@@ -70,6 +132,7 @@ function mostra(contenuto) {
   // non da estranei: l'HTML è quello generato dalla build dal Markdown.
   corpo.innerHTML = contenuto.html ?? '';
   for (const embed of contenuto.embeds ?? []) corpo.append(iframeEmbed(embed));
+  rendiIngrandibili(corpo);
   reveal.append(corpo);
 
   const nav = document.createElement('p');

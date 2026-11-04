@@ -56,6 +56,23 @@
   --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.46, 0.64, 1);
 
+  /* --- Cornice natalizia delle foto (![..](img/foto.jpg#cornice)) ------- */
+  /* È un oggetto "fisico", quindi ha gli stessi colori nei due temi.        */
+  --frame-width: 24rem;                 /* larghezza massima della foto incorniciata */
+  --frame-border: 12px;                 /* spessore del bordo a righe */
+  --frame-stripe: 9px;                  /* larghezza di ogni riga */
+  --frame-stripe-a: #b3262e;            /* rosso bastoncino di zucchero */
+  --frame-stripe-b: #f7f1e6;            /* panna */
+  --frame-mat: #fbf8f2;                 /* il cartoncino attorno alla foto */
+  --frame-mat-space: 12px;              /* quanto cartoncino si vede */
+  --frame-caption: #5b4636;             /* colore della didascalia */
+  --frame-star: #e2bc7c;                /* la stella in cima */
+  --frame-tilt: -2deg;                  /* inclinazione, 0deg per tenerla dritta */
+  --font-hand: 'Bradley Hand', 'Segoe Print', 'Comic Sans MS', cursive;
+
+  --photo-small-width: 22rem;           /* foto con #piccola */
+  --lightbox-bg: rgba(5, 7, 12, 0.94);  /* fondo della foto a schermo intero */
+
   /* --- Colori: tema notturno (predefinito) ----------------------------- */
   --bg: #0b0e14;
   --bg-glow-1: rgba(197, 154, 85, 0.16);   /* alone caldo in alto */

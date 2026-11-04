@@ -124,6 +124,23 @@ cifrato**: non esistono mai come file pubblici.
 
 Il testo fra virgolette dopo il percorso diventa la didascalia.
 
+Tutte le foto si possono **ingrandire a schermo intero** con un clic (o con
+Invio da tastiera); si chiudono con un altro clic, con ✕ o con Esc. Non serve
+scrivere niente: vale da sola per ogni foto che aggiungi.
+
+Una foto su una riga da sola occupa tutta la larghezza del testo. Per cambiarla,
+aggiungi uno stile dopo il percorso, con un `#`:
+
+| scrivi | ottieni |
+|---|---|
+| `![Noi](img/foto.jpg#piccola)` | foto più piccola e centrata |
+| `![Noi](img/foto.jpg#cornice)` | foto in una **cornice natalizia**: bordo a righe bianche e rosse, stella in cima, leggermente inclinata |
+
+Con uno stile la foto viene anche salvata più leggera (900 px invece di 1400).
+Se sbagli il nome, la build si ferma e ti dice quali stili esistono. Colori,
+dimensione e inclinazione della cornice si cambiano nelle variabili `--frame-…`
+di `theme.css`.
+
 Occhio al peso: chi apre una casella scarica tutta la busta di quel giorno. Un
 paio di MB per giorno è ragionevole; oltre i 4 MB la build avvisa. Per immagini
 più leggere abbassa `images.maxWidth` o `images.quality` in `config.json`.
