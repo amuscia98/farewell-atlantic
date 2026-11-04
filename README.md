@@ -207,6 +207,36 @@ Dopo ogni modifica: `npm run build`.
 
 ---
 
+## Backup
+
+`content/` esiste solo sul tuo computer: è l'unica cosa che non sta su GitHub,
+e senza quella cartella i giorni cifrati non si recuperano più. Per salvarla:
+
+```bash
+npm run backup
+```
+
+Crea una copia **in chiaro** di `content/` in
+`~/Documents/farewell-atlantic-backup/content-AAAA-MM-GG_hhmmss`. Ogni backup
+ha un nome nuovo, quindi i precedenti restano: puoi tornare a una versione
+vecchia quando vuoi.
+
+Quella cartella sta sullo stesso disco del progetto. Per proteggerti anche da
+un guasto del computer, salva il backup su un disco esterno:
+
+```bash
+npm run backup -- /Volumes/NOME_DISCO
+```
+
+La copia contiene tutte le risposte, quindi tienila in un posto solo tuo. Per
+lo stesso motivo il comando si rifiuta di salvarla dentro il progetto: finirebbe
+su GitHub al primo commit.
+
+**Per ripristinare:** copia la cartella di backup nel progetto, rinominala
+`content` e lancia `npm run build`.
+
+---
+
 ## Pubblicare su GitHub Pages
 
 La cartella `docs/` è il sito pronto, ed è l'unica cosa che va committata.
@@ -226,8 +256,9 @@ Dopo un minuto il sito è su `https://amuscia98.github.io/farewell-atlantic/`.
 Due cose da ricordare:
 
 - `content/` è in `.gitignore`: le risposte e il materiale in chiaro restano sul
-  tuo computer. **Fanne una copia di scorta** — se perdi quella cartella, i
-  contenuti cifrati non si recuperano in alcun modo.
+  tuo computer. **Fanne una copia di scorta** con `npm run backup` (vedi
+  [Backup](#backup)): se perdi quella cartella, i contenuti cifrati non si
+  recuperano in alcun modo.
 - le pagine hanno `noindex`: non finiscono sui motori di ricerca, ma chi ha il
   link le apre. Se vuoi che siano indicizzate, togli il meta `robots` dai
   template in `src/templates/`.
@@ -272,6 +303,7 @@ build/
   build.mjs           la build: legge content/, cifra, genera docs/
   make-placeholders.mjs
   serve.mjs           server per l'anteprima locale
+  backup.mjs          copia di content/ con data e ora (npm run backup)
   lib/                front-matter, immagini e Markdown, cifratura
 src/
   assets/css/theme.css   ← le variabili: colori, font, spaziature
@@ -308,5 +340,6 @@ vecchia.
 compare un errore su `DecompressionStream`, metti `"compress": false` in
 `config.json` e ricostruisci.
 
-**Ho perso la cartella `content/`** — i contenuti cifrati non sono recuperabili.
-Per questo vale la pena tenerne una copia di scorta.
+**Ho perso la cartella `content/`** — ripristinala dall'ultimo `npm run backup`
+(vedi [Backup](#backup)). Senza un backup i contenuti cifrati non sono
+recuperabili.

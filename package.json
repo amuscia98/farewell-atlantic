@@ -8,7 +8,8 @@
     "build": "node build/build.mjs",
     "preview": "node build/serve.mjs",
     "dev": "node build/build.mjs && node build/serve.mjs",
-    "placeholders": "node build/make-placeholders.mjs"
+    "placeholders": "node build/make-placeholders.mjs",
+    "backup": "node build/backup.mjs"
   },
   "engines": {
     "node": ">=18"
