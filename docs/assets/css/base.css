@@ -512,6 +512,46 @@ main { flex: 1; width: 100%; }
   color: var(--frame-caption);
 }
 
+/* --- Foto affiancate ----------------------------------------------------
+   Più foto su righe consecutive del Markdown: stessa larghezza, stesso
+   formato (ritagliate a --gallery-ratio). A schermo intero si vedono intere. */
+
+.reveal__body .galleria {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: var(--gallery-gap);
+  align-items: start;
+}
+
+.reveal__body .galleria figure { margin: 0; }
+
+.reveal__body .galleria img {
+  aspect-ratio: var(--gallery-ratio);
+  object-fit: cover;
+}
+
+.reveal__body .galleria figure.foto--piccola { width: auto; }
+
+.reveal__body .galleria figure.foto--cornice {
+  width: auto;
+  margin: var(--space-6) 0 var(--space-4);
+}
+/* le cornici si inclinano in versi opposti, come foto appoggiate a caso */
+.reveal__body .galleria figure.foto--cornice:nth-child(even) {
+  transform: rotate(calc(var(--frame-tilt) * -1));
+}
+.reveal__body .galleria figure.foto--cornice:hover { transform: rotate(0deg) scale(1.02); }
+
+@media (max-width: 30rem) {
+  .reveal__body .galleria { gap: var(--space-3); }
+  .reveal__body .galleria figure.foto--cornice {
+    --frame-border: 7px;
+    --frame-stripe: 6px;
+    --frame-mat-space: 6px;
+  }
+}
+
 /* --- Foto a schermo intero ---------------------------------------------- */
 
 .reveal__body img.is-zoomable { cursor: zoom-in; }

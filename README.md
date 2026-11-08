@@ -124,6 +124,18 @@ cifrato**: non esistono mai come file pubblici.
 
 Il testo fra virgolette dopo il percorso diventa la didascalia.
 
+**Foto affiancate:** scrivi le foto su righe consecutive, **senza una riga vuota
+in mezzo**, e vengono messe una di fianco all'altra, tutte con lo stesso formato:
+
+```markdown
+![La Settimana Enigmistica](img/settimana-enigmistica.jpg#cornice)
+![L'ufficio a Natale](img/ufficio-natale.jpg#cornice)
+```
+
+Per avere lo stesso formato vengono ritagliate a 4:5 (`--gallery-ratio` in
+`theme.css`); a schermo intero si vedono intere. Con una riga vuota fra le due,
+invece, vanno una sotto l'altra.
+
 Tutte le foto si possono **ingrandire a schermo intero** con un clic (o con
 Invio da tastiera); si chiudono con un altro clic, con ✕ o con Esc. Non serve
 scrivere niente: vale da sola per ogni foto che aggiungi.

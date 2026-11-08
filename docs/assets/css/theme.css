@@ -72,6 +72,8 @@
 
   --photo-small-width: 22rem;           /* foto con #piccola */
   --lightbox-bg: rgba(5, 7, 12, 0.94);  /* fondo della foto a schermo intero */
+  --gallery-ratio: 4 / 5;               /* formato comune delle foto affiancate */
+  --gallery-gap: var(--space-5);        /* spazio fra le foto affiancate */
 
   /* --- Colori: tema notturno (predefinito) ----------------------------- */
   --bg: #0b0e14;

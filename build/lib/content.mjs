@@ -120,19 +120,29 @@ function decodeEntita(valore) {
     .replace(/&gt;/g, '>');
 }
 
+function figura(img) {
+  const title = /\btitle="([^"]*)"/.exec(img);
+  const src = /\bsrc="([^"]*)"/.exec(img);
+  const classi = src ? leggiStili(decodeEntita(src[1])).stili.map((s) => s.classe) : [];
+  const didascalia = title ? `<figcaption>${title[1]}</figcaption>` : '';
+  const attributo = classi.length ? ` class="${classi.join(' ')}"` : '';
+  return `<figure${attributo}>${img}${didascalia}</figure>`;
+}
+
 /**
  * `<p><img ...></p>` diventa una `<figure>`, con didascalia se c'è il title
  * e con le classi degli stili scritti dopo il # (#cornice, #piccola).
+ *
+ * Più foto su righe consecutive (senza riga vuota in mezzo) finiscono nello
+ * stesso paragrafo: diventano una galleria, affiancate e con lo stesso formato.
  */
 function avvolgiFigure(html) {
-  return html.replace(/<p>(<img\b[^>]*>)<\/p>/g, (_, img) => {
-    const title = /\btitle="([^"]*)"/.exec(img);
-    const src = /\bsrc="([^"]*)"/.exec(img);
-    const classi = src ? leggiStili(decodeEntita(src[1])).stili.map((s) => s.classe) : [];
-    const didascalia = title ? `<figcaption>${title[1]}</figcaption>` : '';
-    const attributo = classi.length ? ` class="${classi.join(' ')}"` : '';
-    return `<figure${attributo}>${img}${didascalia}</figure>`;
-  });
+  return html
+    .replace(/<p>((?:<img\b[^>]*>\s*(?:<br>)?\s*){2,})<\/p>/g, (_, gruppo) => {
+      const immagini = gruppo.match(/<img\b[^>]*>/g);
+      return `<div class="galleria">${immagini.map(figura).join('')}</div>`;
+    })
+    .replace(/<p>(<img\b[^>]*>)<\/p>/g, (_, img) => figura(img));
 }
 
 async function incorporaImmagini(html, dir, opzioni) {
