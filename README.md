@@ -133,7 +133,8 @@ in mezzo**, e vengono messe una di fianco all'altra, tutte con lo stesso formato
 ```
 
 Per avere lo stesso formato vengono ritagliate a 4:5 (`--gallery-ratio` in
-`theme.css`); a schermo intero si vedono intere. Con una riga vuota fra le due,
+`theme.css`); a schermo intero si vedono intere. Se le foto sono già quadrate,
+aggiungi `#quadrata` a tutte: restano 1:1 e non perdono i bordi. Con una riga vuota fra le due,
 invece, vanno una sotto l'altra.
 
 Tutte le foto si possono **ingrandire a schermo intero** con un clic (o con
@@ -147,6 +148,9 @@ aggiungi uno stile dopo il percorso, con un `#`:
 |---|---|
 | `![Noi](img/foto.jpg#piccola)` | foto più piccola e centrata |
 | `![Noi](img/foto.jpg#cornice)` | foto in una **cornice natalizia**: bordo a righe bianche e rosse, stella in cima, leggermente inclinata |
+| `![Noi](img/foto.jpg#quadrata)` | foto ritagliata quadrata (1:1) |
+
+Gli stili si combinano con `+`: `![Noi](img/foto.jpg#cornice+quadrata)`.
 
 Con uno stile la foto viene anche salvata più leggera (900 px invece di 1400).
 Se sbagli il nome, la build si ferma e ti dice quali stili esistono. Colori,

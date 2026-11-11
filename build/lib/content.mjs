@@ -74,6 +74,7 @@ function estraiVideoDalCorpo(markdown) {
 const STILI = {
   piccola: { classe: 'foto--piccola', maxWidth: 900 },
   cornice: { classe: 'foto--cornice', maxWidth: 900 },
+  quadrata: { classe: 'foto--quadrata', maxWidth: Infinity },
 };
 
 function leggiStili(src) {
