@@ -169,6 +169,9 @@ I video **non vanno messi nel repository**. Caricali su YouTube come
 - nel front-matter, sotto `video:`
 - oppure su una riga da sola nel testo, ed è il link stesso a diventare il player
 
+Se il link ha un punto di partenza (`&t=59`, `?t=1m59s`, il "Condividi → Inizia
+da" di YouTube), il player parte da lì.
+
 Il link finisce dentro la parte cifrata, quindi chi non risolve l'indovinello non
 lo vede nemmeno. Resta però un video raggiungibile da chi ha l'URL: "non in
 elenco" vuol dire nascosto, non privato.

@@ -45,11 +45,26 @@ const PATTERN_VIDEO = [
   [/vimeo\.com\/(?:channels\/[\w-]+\/|groups\/[\w-]+\/videos\/)?(\d{5,})/i, 'vimeo'],
 ];
 
+/** Secondi di partenza da t=59, t=59s, t=1m59s, start=59 o #t=1m59s; 0 se assente. */
+function leggiInizio(url) {
+  const match = /[?&#](?:t|start)=([\dhms]+)/i.exec(url);
+  if (!match) return 0;
+  const valore = match[1].toLowerCase();
+  if (/^\d+$/.test(valore)) return Number(valore);
+  const parti = /^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/.exec(valore);
+  if (!parti) return 0;
+  return Number(parti[1] ?? 0) * 3600 + Number(parti[2] ?? 0) * 60 + Number(parti[3] ?? 0);
+}
+
 export function leggiVideo(url) {
   const testo = String(url).trim();
   for (const [pattern, provider] of PATTERN_VIDEO) {
     const match = pattern.exec(testo);
-    if (match) return { provider, id: match[1] };
+    if (!match) continue;
+    const video = { provider, id: match[1] };
+    const inizio = leggiInizio(testo);
+    if (inizio > 0) video.inizio = inizio;
+    return video;
   }
   return null;
 }

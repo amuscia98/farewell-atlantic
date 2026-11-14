@@ -34,10 +34,11 @@ bustaPromise.catch(() => { /* gestito al momento dell'apertura */ });
 // --- Resa del contenuto ----------------------------------------------------
 
 function iframeEmbed(embed) {
+  const inizio = Number(embed.inizio) > 0 ? Math.floor(Number(embed.inizio)) : 0;
   const src =
     embed.provider === 'vimeo'
-      ? `https://player.vimeo.com/video/${embed.id}`
-      : `https://www.youtube-nocookie.com/embed/${embed.id}?rel=0`;
+      ? `https://player.vimeo.com/video/${embed.id}${inizio ? `#t=${inizio}s` : ''}`
+      : `https://www.youtube-nocookie.com/embed/${embed.id}?rel=0${inizio ? `&start=${inizio}` : ''}`;
 
   const wrapper = document.createElement('div');
   wrapper.className = 'embed';
