@@ -74,6 +74,11 @@
   --lightbox-bg: rgba(5, 7, 12, 0.94);  /* fondo della foto a schermo intero */
   --gallery-ratio: 4 / 5;               /* formato comune delle foto affiancate */
   --gallery-gap: var(--space-5);        /* spazio fra le foto affiancate */
+  --carousel-width: 30rem;              /* larghezza massima del carosello (#carosello) */
+  --carousel-ratio: 1 / 1;              /* formato della finestra: le foto ci stanno intere */
+  --carousel-arrow-bg: rgba(12, 15, 22, 0.55);  /* fondo delle frecce sopra la foto */
+  --carousel-dot: rgba(91, 70, 54, 0.3);        /* pallino spento (sul cartoncino) */
+  --carousel-dot-active: var(--frame-stripe-a); /* pallino della foto visibile */
 
   /* --- Colori: tema notturno (predefinito) ----------------------------- */
   --bg: #0b0e14;

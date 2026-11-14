@@ -117,6 +117,96 @@ function rendiIngrandibili(corpo) {
   }
 }
 
+function freccia(verso, etichetta, simbolo) {
+  const bottone = document.createElement('button');
+  bottone.type = 'button';
+  bottone.className = `carosello__freccia carosello__freccia--${verso}`;
+  bottone.setAttribute('aria-label', etichetta);
+  bottone.textContent = simbolo;
+  return bottone;
+}
+
+/** Aggiunge frecce e pallini ai caroselli generati dalla build (#carosello). */
+function preparaCaroselli(corpo) {
+  for (const carosello of corpo.querySelectorAll('.carosello')) {
+    const binario = carosello.querySelector('.carosello__binario');
+    const foto = binario ? [...binario.children] : [];
+    if (foto.length < 2) continue;
+
+    binario.tabIndex = 0;
+    binario.setAttribute('role', 'region');
+    binario.setAttribute('aria-roledescription', 'carosello');
+    binario.setAttribute('aria-label', `Galleria di ${foto.length} foto: usa le frecce per scorrerle`);
+
+    // Le foto oltre la prima si decodificano solo quando servono.
+    foto.forEach((figura, i) => {
+      const img = figura.querySelector('img');
+      if (!img) return;
+      img.decoding = 'async';
+      if (i > 0) img.loading = 'lazy';
+    });
+
+    const vista = document.createElement('div');
+    vista.className = 'carosello__vista';
+    binario.before(vista);
+    vista.append(binario);
+
+    const prec = freccia('prec', 'Foto precedente', '‹');
+    const succ = freccia('succ', 'Foto successiva', '›');
+    vista.append(prec, succ);
+
+    const punti = document.createElement('div');
+    punti.className = 'carosello__punti';
+    const bottoni = foto.map((_, i) => {
+      const punto = document.createElement('button');
+      punto.type = 'button';
+      punto.className = 'carosello__punto';
+      punto.setAttribute('aria-label', `Foto ${i + 1} di ${foto.length}`);
+      punto.addEventListener('click', () => vai(i));
+      return punto;
+    });
+    punti.append(...bottoni);
+    carosello.append(punti);
+
+    let attuale = -1;
+    const indice = () => Math.round(binario.scrollLeft / Math.max(1, binario.clientWidth));
+    const vai = (i) => {
+      const destinazione = Math.max(0, Math.min(foto.length - 1, i));
+      binario.scrollTo({
+        left: destinazione * binario.clientWidth,
+        behavior: motoRidotto ? 'auto' : 'smooth',
+      });
+    };
+    const aggiorna = () => {
+      const i = indice();
+      if (i === attuale) return;
+      attuale = i;
+      bottoni.forEach((b, j) => b.setAttribute('aria-current', String(j === i)));
+      prec.disabled = i === 0;
+      succ.disabled = i === foto.length - 1;
+    };
+
+    prec.addEventListener('click', () => vai(indice() - 1));
+    succ.addEventListener('click', () => vai(indice() + 1));
+    binario.addEventListener('keydown', (evento) => {
+      if (evento.key === 'ArrowLeft') vai(indice() - 1);
+      else if (evento.key === 'ArrowRight') vai(indice() + 1);
+      else return;
+      evento.preventDefault();
+    });
+    let inAttesa = false;
+    binario.addEventListener('scroll', () => {
+      if (inAttesa) return;
+      inAttesa = true;
+      requestAnimationFrame(() => {
+        inAttesa = false;
+        aggiorna();
+      });
+    }, { passive: true });
+    aggiorna();
+  }
+}
+
 function mostra(contenuto) {
   reveal.replaceChildren();
 
@@ -135,6 +225,7 @@ function mostra(contenuto) {
   for (const embed of contenuto.embeds ?? []) corpo.append(iframeEmbed(embed));
   rendiIngrandibili(corpo);
   reveal.append(corpo);
+  preparaCaroselli(corpo);
 
   const nav = document.createElement('p');
   nav.className = 'reveal__next';

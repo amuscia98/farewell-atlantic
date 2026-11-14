@@ -137,6 +137,20 @@ Per avere lo stesso formato vengono ritagliate a 4:5 (`--gallery-ratio` in
 aggiungi `#quadrata` a tutte: restano 1:1 e non perdono i bordi. Con una riga vuota fra le due,
 invece, vanno una sotto l'altra.
 
+**Carosello:** quando le foto sono tante (dalle 3 in su), aggiungi `#carosello`
+a tutte, sempre su righe consecutive. Si vede una foto alla volta, in un'unica
+cornice dritta se c'è anche `#cornice`. Si passa alla successiva scorrendo col
+dito, con le frecce ai lati, con i pallini sotto o con le frecce della tastiera:
+
+```markdown
+![Calcio balilla 1](img/calcio-1.webp#carosello+cornice)
+![Calcio balilla 2](img/calcio-2.webp#carosello+cornice)
+![Calcio balilla 3](img/calcio-3.webp#carosello+cornice)
+```
+
+Le foto non vengono ritagliate: stanno intere in una finestra quadrata
+(`--carousel-ratio` in `theme.css`), e sono salvate a 1000 px.
+
 Tutte le foto si possono **ingrandire a schermo intero** con un clic (o con
 Invio da tastiera); si chiudono con un altro clic, con ✕ o con Esc. Non serve
 scrivere niente: vale da sola per ogni foto che aggiungi.
@@ -149,6 +163,7 @@ aggiungi uno stile dopo il percorso, con un `#`:
 | `![Noi](img/foto.jpg#piccola)` | foto più piccola e centrata |
 | `![Noi](img/foto.jpg#cornice)` | foto in una **cornice natalizia**: bordo a righe bianche e rosse, stella in cima, leggermente inclinata |
 | `![Noi](img/foto.jpg#quadrata)` | foto ritagliata quadrata (1:1) |
+| `![Noi](img/foto.jpg#carosello)` | foto in un carosello, insieme a quelle sulle righe vicine |
 
 Gli stili si combinano con `+`: `![Noi](img/foto.jpg#cornice+quadrata)`.
 

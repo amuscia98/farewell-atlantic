@@ -90,6 +90,7 @@ const STILI = {
   piccola: { classe: 'foto--piccola', maxWidth: 900 },
   cornice: { classe: 'foto--cornice', maxWidth: 900 },
   quadrata: { classe: 'foto--quadrata', maxWidth: Infinity },
+  carosello: { classe: 'foto--carosello', maxWidth: 1000 },
 };
 
 function leggiStili(src) {
@@ -152,10 +153,31 @@ function figura(img) {
  * Più foto su righe consecutive (senza riga vuota in mezzo) finiscono nello
  * stesso paragrafo: diventano una galleria, affiancate e con lo stesso formato.
  */
+function stiliDi(img) {
+  const src = /\bsrc="([^"]*)"/.exec(img);
+  return src ? leggiStili(decodeEntita(src[1])).stili : [];
+}
+
+/**
+ * Più foto con #carosello su righe consecutive: una foto alla volta, dentro
+ * un'unica cornice (se c'è anche #cornice), da scorrere con il dito, con le
+ * frecce o con i pallini. I comandi li aggiunge day.js.
+ */
+function carosello(immagini) {
+  const conCornice = immagini.some((img) => stiliDi(img).includes(STILI.cornice));
+  const figure = immagini.map((img) => {
+    const title = /\btitle="([^"]*)"/.exec(img);
+    return `<figure>${img}${title ? `<figcaption>${title[1]}</figcaption>` : ''}</figure>`;
+  });
+  const classi = ['carosello', ...(conCornice ? ['carosello--cornice'] : [])].join(' ');
+  return `<div class="${classi}"><div class="carosello__binario">${figure.join('')}</div></div>`;
+}
+
 function avvolgiFigure(html) {
   return html
     .replace(/<p>((?:<img\b[^>]*>\s*(?:<br>)?\s*){2,})<\/p>/g, (_, gruppo) => {
       const immagini = gruppo.match(/<img\b[^>]*>/g);
+      if (immagini.some((img) => stiliDi(img).includes(STILI.carosello))) return carosello(immagini);
       return `<div class="galleria">${immagini.map(figura).join('')}</div>`;
     })
     .replace(/<p>(<img\b[^>]*>)<\/p>/g, (_, img) => figura(img));
