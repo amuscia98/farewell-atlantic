@@ -560,6 +560,18 @@ main { flex: 1; width: 100%; }
   }
 }
 
+/* --- Video locali: ![..](video/clip.mp4#cornice) ------------------------ */
+
+.reveal__body figure.video video {
+  display: block;
+  width: 100%;
+  max-height: 75vh;
+  background: #000;
+  border-radius: var(--radius-md);
+}
+.reveal__body figure.video.foto--cornice { width: min(100%, var(--video-frame-width)); }
+.reveal__body figure.video.foto--cornice video { border-radius: 2px; }
+
 /* --- Carosello: ![..](img/foto.jpg#carosello+cornice) su righe vicine ----
    Una foto alla volta in un'unica cornice dritta; si scorre con il dito,
    con le frecce, con i pallini o con le frecce della tastiera. */

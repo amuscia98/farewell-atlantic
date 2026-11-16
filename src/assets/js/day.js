@@ -207,6 +207,20 @@ function preparaCaroselli(corpo) {
   }
 }
 
+/** I video locali arrivano dentro la busta: li diamo al player come blob. */
+async function preparaVideo(corpo) {
+  for (const video of corpo.querySelectorAll('video[data-video]')) {
+    try {
+      const blob = await (await fetch(video.dataset.video)).blob();
+      // #t=0.001 fa mostrare il primo fotogramma anche su iPhone.
+      video.src = `${URL.createObjectURL(blob)}#t=0.001`;
+    } catch {
+      video.replaceWith(document.createTextNode('(questo video non si riesce a riprodurre qui)'));
+    }
+    video.removeAttribute('data-video');
+  }
+}
+
 function mostra(contenuto) {
   reveal.replaceChildren();
 
@@ -226,6 +240,7 @@ function mostra(contenuto) {
   rendiIngrandibili(corpo);
   reveal.append(corpo);
   preparaCaroselli(corpo);
+  preparaVideo(corpo);
 
   const nav = document.createElement('p');
   nav.className = 'reveal__next';

@@ -184,6 +184,24 @@ I video **non vanno messi nel repository**. Caricali su YouTube come
 - nel front-matter, sotto `video:`
 - oppure su una riga da sola nel testo, ed è il link stesso a diventare il player
 
+**Video brevi dal telefono** (qualche secondo): mettili nella cartella del
+giorno, per esempio in `video/`, e scrivili come una foto. Formati: mp4, m4v,
+webm, mov.
+
+```markdown
+![Oplà](video/opla.mp4#cornice)
+```
+
+Finiscono **dentro la busta cifrata**, come le foto, ma la build non li
+ricomprime: alleggeriscili prima, sul Mac basta
+
+```bash
+avconvert --source originale.mp4 --preset Preset640x480 --output content/day-04/video/opla.mp4
+```
+
+(3 secondi passano da 7 MB a 1 MB). Oltre i 3 MB la build avvisa. Per i video
+lunghi resta meglio YouTube o Vimeo.
+
 Se il link ha un punto di partenza (`&t=59`, `?t=1m59s`, il "Condividi → Inizia
 da" di YouTube), il player parte da lì.
 

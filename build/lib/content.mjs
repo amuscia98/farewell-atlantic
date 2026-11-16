@@ -247,6 +247,61 @@ async function elencaImmagini(dir) {
   return trovate;
 }
 
+// --- Video locali ------------------------------------------------------------
+
+// Un video breve salvato nella cartella del giorno, scritto come una foto:
+// ![oplà](video/opla.mp4#cornice). Finisce DENTRO la busta cifrata, così
+// com'è: la build non lo ricomprime, quindi va alleggerito prima (README).
+const VIDEO_LOCALI = { '.mp4': 'video/mp4', '.m4v': 'video/mp4', '.webm': 'video/webm', '.mov': 'video/quicktime' };
+const VIDEO_PESANTE = 3 * 1024 * 1024;
+
+const eVideoLocale = (src) => Boolean(VIDEO_LOCALI[path.extname(leggiStili(decodeEntita(src)).percorso).toLowerCase()]);
+
+/** `<p><img src="video/x.mp4"></p>` diventa una `<figure class="video">` con un segnaposto. */
+function segnaVideo(html) {
+  return html.replace(/<p>(<img\b[^>]*>)<\/p>/g, (intero, img) => {
+    const src = /\bsrc="([^"]*)"/.exec(img);
+    if (!src || !eVideoLocale(src[1])) return intero;
+    const alt = /\balt="([^"]*)"/.exec(img);
+    const title = /\btitle="([^"]*)"/.exec(img);
+    const classi = ['video', ...leggiStili(decodeEntita(src[1])).stili.map((s) => s.classe)].join(' ');
+    const etichetta = alt?.[1] ? ` aria-label="${alt[1]}"` : '';
+    const didascalia = title ? `<figcaption>${title[1]}</figcaption>` : '';
+    return `<figure class="${classi}"><video controls playsinline preload="metadata"${etichetta} data-video-file="${src[1]}"></video>${didascalia}</figure>`;
+  });
+}
+
+async function incorporaVideo(html, dir, avvisi, day) {
+  let quanti = 0;
+  let byte = 0;
+  const pezzi = [];
+  let ultimo = 0;
+  for (const match of html.matchAll(/data-video-file="([^"]*)"/g)) {
+    const grezza = leggiStili(decodeEntita(match[1])).percorso;
+    const file = path.resolve(dir, grezza.replace(/^\.\//, ''));
+    if (!file.startsWith(path.resolve(dir))) throw new Error(`il video "${grezza}" esce dalla cartella del giorno`);
+    let contenuto;
+    try {
+      contenuto = await readFile(file);
+    } catch {
+      throw new Error(`giorno ${day}: non trovo il video "${grezza}"`);
+    }
+    if (contenuto.length > VIDEO_PESANTE) {
+      avvisi.push(
+        `giorno ${day}: il video "${grezza}" pesa ${(contenuto.length / 1024 / 1024).toFixed(1)} MB, ` +
+          'chi apre la casella lo scarica tutto: alleggeriscilo (vedi README, "Video").',
+      );
+    }
+    const mime = VIDEO_LOCALI[path.extname(file).toLowerCase()];
+    pezzi.push(html.slice(ultimo, match.index), `data-video="data:${mime};base64,${contenuto.toString('base64')}"`);
+    ultimo = match.index + match[0].length;
+    quanti += 1;
+    byte += contenuto.length;
+  }
+  pezzi.push(html.slice(ultimo));
+  return { html: pezzi.join(''), quanti, byte };
+}
+
 // --- Il giorno completo ----------------------------------------------------
 
 export async function leggiGiorno(dir, day, config) {
@@ -310,8 +365,12 @@ export async function leggiGiorno(dir, day, config) {
     embeds.push(video);
   }
 
-  const htmlGrezzo = avvolgiFigure(marked.parse(markdown));
-  const { html, immagini, byte } = await incorporaImmagini(htmlGrezzo, dir, config.images);
+  const htmlGrezzo = avvolgiFigure(segnaVideo(marked.parse(markdown)));
+  const conImmagini = await incorporaImmagini(htmlGrezzo, dir, config.images);
+  const { immagini } = conImmagini;
+  const conVideo = await incorporaVideo(conImmagini.html, dir, avvisi, day);
+  const html = conVideo.html;
+  const byte = conImmagini.byte + conVideo.byte;
 
   return {
     day,
@@ -325,6 +384,6 @@ export async function leggiGiorno(dir, day, config) {
       html,
       embeds,
     },
-    stats: { immagini, byteImmagini: byte, video: embeds.length },
+    stats: { immagini, byteImmagini: byte, video: embeds.length + conVideo.quanti },
   };
 }
