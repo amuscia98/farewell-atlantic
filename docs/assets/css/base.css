@@ -652,6 +652,17 @@ main { flex: 1; width: 100%; }
   justify-content: center;
   margin-top: var(--space-2);
 }
+.carosello__conto {
+  min-height: 1.5rem;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-hand);
+  font-size: var(--text-lg);
+  color: var(--frame-caption);
+  font-variant-numeric: tabular-nums;
+}
+.carosello:not(.carosello--cornice) .carosello__conto { font-family: inherit; font-size: var(--text-sm); color: var(--text-faint); }
+
 .carosello__punto {
   width: 1.5rem;
   height: 1.5rem;

@@ -140,7 +140,8 @@ invece, vanno una sotto l'altra.
 **Carosello:** quando le foto sono tante (dalle 3 in su), aggiungi `#carosello`
 a tutte, sempre su righe consecutive. Si vede una foto alla volta, in un'unica
 cornice dritta se c'è anche `#cornice`. Si passa alla successiva scorrendo col
-dito, con le frecce ai lati, con i pallini sotto o con le frecce della tastiera:
+dito, con le frecce ai lati, con i pallini sotto (oltre le 8 foto diventano un
+contatore "3 / 18") o con le frecce della tastiera:
 
 ```markdown
 ![Calcio balilla 1](img/calcio-1.webp#carosello+cornice)

@@ -155,17 +155,26 @@ function preparaCaroselli(corpo) {
     const succ = freccia('succ', 'Foto successiva', '›');
     vista.append(prec, succ);
 
+    // Fino a 8 foto un pallino per foto; oltre, un contatore "3 / 18"
+    // (tanti pallini non starebbero sullo schermo di un telefono).
     const punti = document.createElement('div');
     punti.className = 'carosello__punti';
-    const bottoni = foto.map((_, i) => {
-      const punto = document.createElement('button');
-      punto.type = 'button';
-      punto.className = 'carosello__punto';
-      punto.setAttribute('aria-label', `Foto ${i + 1} di ${foto.length}`);
-      punto.addEventListener('click', () => vai(i));
-      return punto;
-    });
-    punti.append(...bottoni);
+    const conPallini = foto.length <= 8;
+    const bottoni = conPallini
+      ? foto.map((_, i) => {
+          const punto = document.createElement('button');
+          punto.type = 'button';
+          punto.className = 'carosello__punto';
+          punto.setAttribute('aria-label', `Foto ${i + 1} di ${foto.length}`);
+          punto.addEventListener('click', () => vai(i));
+          return punto;
+        })
+      : [];
+    const conto = document.createElement('span');
+    conto.className = 'carosello__conto';
+    conto.setAttribute('aria-live', 'polite');
+    if (conPallini) punti.append(...bottoni);
+    else punti.append(conto);
     carosello.append(punti);
 
     let attuale = -1;
@@ -182,6 +191,7 @@ function preparaCaroselli(corpo) {
       if (i === attuale) return;
       attuale = i;
       bottoni.forEach((b, j) => b.setAttribute('aria-current', String(j === i)));
+      conto.textContent = `${i + 1} / ${foto.length}`;
       prec.disabled = i === 0;
       succ.disabled = i === foto.length - 1;
     };
