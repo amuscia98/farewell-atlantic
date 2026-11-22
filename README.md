@@ -149,6 +149,10 @@ contatore "3 / 18") o con le frecce della tastiera:
 ![Calcio balilla 3](img/calcio-3.webp#carosello+cornice)
 ```
 
+Nel carosello possono stare anche i video brevi (vedi "Video"): basta scriverli
+fra le foto, `![Clip](video/clip.mp4#carosello+cornice)`. Quando passi alla
+foto successiva, il video si ferma.
+
 Le foto non vengono ritagliate: stanno intere in una finestra quadrata
 (`--carousel-ratio` in `theme.css`), e sono salvate a 1000 px.
 

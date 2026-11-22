@@ -166,6 +166,8 @@ function stiliDi(img) {
 function carosello(immagini) {
   const conCornice = immagini.some((img) => stiliDi(img).includes(STILI.cornice));
   const figure = immagini.map((img) => {
+    // Nel carosello possono stare anche video locali: ![..](video/clip.mp4#carosello)
+    if (puntaAVideo(img)) return `<figure class="video">${playerVideo(img)}</figure>`;
     const title = /\btitle="([^"]*)"/.exec(img);
     return `<figure>${img}${title ? `<figcaption>${title[1]}</figcaption>` : ''}</figure>`;
   });
@@ -257,17 +259,28 @@ const VIDEO_PESANTE = 3 * 1024 * 1024;
 
 const eVideoLocale = (src) => Boolean(VIDEO_LOCALI[path.extname(leggiStili(decodeEntita(src)).percorso).toLowerCase()]);
 
+/** Il player (con didascalia) per un `<img>` che punta a un video locale. */
+function playerVideo(img) {
+  const src = /\bsrc="([^"]*)"/.exec(img);
+  const alt = /\balt="([^"]*)"/.exec(img);
+  const title = /\btitle="([^"]*)"/.exec(img);
+  const etichetta = alt?.[1] ? ` aria-label="${alt[1]}"` : '';
+  const didascalia = title ? `<figcaption>${title[1]}</figcaption>` : '';
+  return `<video controls playsinline preload="metadata"${etichetta} data-video-file="${src[1]}"></video>${didascalia}`;
+}
+
+const puntaAVideo = (img) => {
+  const src = /\bsrc="([^"]*)"/.exec(img);
+  return Boolean(src && eVideoLocale(src[1]));
+};
+
 /** `<p><img src="video/x.mp4"></p>` diventa una `<figure class="video">` con un segnaposto. */
 function segnaVideo(html) {
   return html.replace(/<p>(<img\b[^>]*>)<\/p>/g, (intero, img) => {
+    if (!puntaAVideo(img)) return intero;
     const src = /\bsrc="([^"]*)"/.exec(img);
-    if (!src || !eVideoLocale(src[1])) return intero;
-    const alt = /\balt="([^"]*)"/.exec(img);
-    const title = /\btitle="([^"]*)"/.exec(img);
     const classi = ['video', ...leggiStili(decodeEntita(src[1])).stili.map((s) => s.classe)].join(' ');
-    const etichetta = alt?.[1] ? ` aria-label="${alt[1]}"` : '';
-    const didascalia = title ? `<figcaption>${title[1]}</figcaption>` : '';
-    return `<figure class="${classi}"><video controls playsinline preload="metadata"${etichetta} data-video-file="${src[1]}"></video>${didascalia}</figure>`;
+    return `<figure class="${classi}">${playerVideo(img)}</figure>`;
   });
 }
 

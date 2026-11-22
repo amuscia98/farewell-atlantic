@@ -192,6 +192,11 @@ function preparaCaroselli(corpo) {
       attuale = i;
       bottoni.forEach((b, j) => b.setAttribute('aria-current', String(j === i)));
       conto.textContent = `${i + 1} / ${foto.length}`;
+      // un video che esce dalla vista si ferma
+      foto.forEach((figura, j) => {
+        const video = figura.querySelector('video');
+        if (video && j !== i && !video.paused) video.pause();
+      });
       prec.disabled = i === 0;
       succ.disabled = i === foto.length - 1;
     };
