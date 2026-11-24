@@ -131,12 +131,20 @@ main { flex: 1; width: 100%; }
 .calendar {
   list-style: none;
   width: 100%;
-  max-width: var(--calendar-width);
+  max-width: var(--calendar-grid-width);
   margin: 0 auto;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--tile-min), 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(var(--calendar-columns), minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+/* Sul telefono le colonne si adattano alla larghezza (di solito 3). */
+@media (max-width: 30rem) {
+  .calendar {
+    grid-template-columns: repeat(auto-fill, minmax(var(--tile-min), 1fr));
+    gap: var(--space-3);
+  }
 }
 
 /* Ogni casella è un pacchetto regalo: carta colorata, nastro, fiocco e un
@@ -993,7 +1001,6 @@ html:has(.lightbox[open]) { overflow: hidden; }
 }
 
 @media (max-width: 30rem) {
-  :root { --tile-min: 5.5rem; }
   .site-head { padding-top: var(--space-7); }
   .theme-toggle { position: static; margin-bottom: var(--space-5); }
 }

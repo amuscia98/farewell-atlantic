@@ -348,7 +348,8 @@ variabili CSS, nessuna regola di layout.
 :root {
   --accent: #c59a55;        /* il colore caldo degli accenti */
   --bg: #0b0e14;            /* il fondo */
-  --tile-min: 7.5rem;       /* larghezza minima di una casella: decide le colonne */
+  --calendar-columns: 5;    /* caselle per riga su computer e tablet (5×5) */
+  --tile-min: 5.5rem;       /* sul telefono: larghezza minima di una casella */
   --radius-md: 12px;
   --font-display: Georgia, serif;
 }
