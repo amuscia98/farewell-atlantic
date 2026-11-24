@@ -1000,7 +1000,23 @@ html:has(.lightbox[open]) { overflow: hidden; }
 
 /* L'interruttore del tema nell'intestazione della pagina del giorno sta in
    riga, non appoggiato all'angolo. */
-.day-head .theme-toggle { position: static; }
+.day-head .theme-toggle { position: static; flex-shrink: 0; }
+.day-head .back,
+.day-head .day-badge { white-space: nowrap; }
+
+/* Sui telefoni l'intestazione del giorno sta su una riga: l'interruttore del
+   tema diventa un bottone tondo con la sola icona. */
+@media (max-width: 30rem) {
+  .day-head { gap: var(--space-3); }
+  .day-head .theme-toggle {
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    font-size: var(--text-base);
+  }
+  .day-head .theme-toggle__testo { display: none; }
+}
 
 noscript .locked-note { display: block; margin-top: var(--space-5); }
 

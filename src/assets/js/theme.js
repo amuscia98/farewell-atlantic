@@ -32,8 +32,18 @@ export function initTheme(bottone) {
 
   const aggiorna = () => {
     const prossimo = effettivo() === 'dark' ? 'light' : 'dark';
-    bottone.textContent = prossimo === 'light' ? '☀ Tema chiaro' : '☾ Tema notturno';
-    bottone.setAttribute('aria-label', `Passa al ${prossimo === 'light' ? 'tema chiaro' : 'tema notturno'}`);
+    // Icona e testo separati: sui telefoni, nelle pagine dei giorni, il testo
+    // si nasconde e resta solo l'icona (vedi .theme-toggle__testo in base.css).
+    const icona = document.createElement('span');
+    icona.setAttribute('aria-hidden', 'true');
+    icona.textContent = prossimo === 'light' ? '☀' : '☾';
+    const testo = document.createElement('span');
+    testo.className = 'theme-toggle__testo';
+    testo.textContent = prossimo === 'light' ? 'Tema chiaro' : 'Tema notturno';
+    bottone.replaceChildren(icona, testo);
+    const azione = `Passa al ${prossimo === 'light' ? 'tema chiaro' : 'tema notturno'}`;
+    bottone.setAttribute('aria-label', azione);
+    bottone.title = azione;
   };
 
   bottone.hidden = false;
