@@ -91,6 +91,10 @@ a:hover { color: var(--accent); }
   font-size: var(--text-sm);
 }
 
+.site-intro:empty {
+  display: none;
+}
+
 .rule {
   width: 4rem;
   height: 1px;

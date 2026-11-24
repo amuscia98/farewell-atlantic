@@ -229,8 +229,7 @@ Ciao a tutti! Ecco come funziona il calendario…
 ```
 
 Nei segnaposto è così il **giorno 1**, pensato per presentare il gioco. Sulla
-home la casella ha il bordo tratteggiato e l'etichetta "libera", e non conta
-nel progresso ("3 indovinelli risolti su 24").
+home la casella ha il bordo tratteggiato e l'etichetta "libera".
 
 **Il contenuto di un giorno pubblico finisce in chiaro nel repository**, immagini
 comprese: chiunque guardi il codice su GitHub lo può leggere. Mettici solo
