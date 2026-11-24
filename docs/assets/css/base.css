@@ -139,98 +139,206 @@ main { flex: 1; width: 100%; }
   gap: var(--space-3);
 }
 
+/* Ogni casella è un pacchetto regalo: carta colorata, nastro, fiocco e un
+   cartellino col numero. I colori stanno in theme.css (--gift-*): la build dà
+   a ogni giorno una carta (carta-1 … carta-6) in modo che due caselle vicine,
+   di lato o una sopra l'altra, non abbiano quasi mai la stessa. */
 .tile {
+  --carta: var(--gift-1-paper);
+  --nastro: var(--gift-1-ribbon);
+  --sigillo: var(--gift-tag);
+  --motivo: none;
+  --motivo-size: auto;
+  --nastro-w: 13%;          /* spessore del nastro */
+  --nastro-y: 30%;          /* altezza del nastro orizzontale */
+
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-1);
+  justify-content: flex-end;
   aspect-ratio: var(--tile-ratio);
-  padding: var(--space-3);
+  padding: 0 var(--space-2) 11%;
   text-align: center;
   text-decoration: none;
-  color: var(--text);
-  background: var(--surface);
-  border: var(--border-width) solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  color: var(--gift-tag-text);
+  background-color: var(--carta);
+  background-image: var(--motivo);
+  background-size: var(--motivo-size);
+  border: var(--border-width) solid rgba(0, 0, 0, 0.28);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.14);
   overflow: hidden;
   transition:
     transform var(--dur-base) var(--ease-out),
-    border-color var(--dur-base),
     box-shadow var(--dur-base),
-    background var(--dur-base);
+    filter var(--dur-base);
 }
 
-.tile::after {
-  /* velo che si accende al passaggio del mouse */
+/* Le sei carte */
+.tile.carta-1 {
+  --carta: var(--gift-1-paper); --nastro: var(--gift-1-ribbon);
+  --motivo: radial-gradient(rgba(255, 255, 255, 0.16) 1.4px, transparent 1.6px);
+  --motivo-size: 12px 12px;
+}
+.tile.carta-2 {
+  --carta: var(--gift-2-paper); --nastro: var(--gift-2-ribbon);
+  --motivo: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.07) 0 5px, transparent 5px 12px);
+}
+.tile.carta-3 {
+  --carta: var(--gift-3-paper); --nastro: var(--gift-3-ribbon);
+  --motivo: radial-gradient(rgba(232, 194, 126, 0.42) 1.2px, transparent 1.4px);
+  --motivo-size: 14px 14px;
+}
+.tile.carta-4 {
+  --carta: var(--gift-4-paper); --nastro: var(--gift-4-ribbon);
+  --motivo: linear-gradient(135deg, rgba(255, 255, 255, 0.22), transparent 55%);
+}
+.tile.carta-5 {
+  --carta: var(--gift-5-paper); --nastro: var(--gift-5-ribbon); --sigillo: var(--gift-5-ribbon);
+  --motivo: repeating-linear-gradient(135deg, rgba(179, 38, 46, 0.22) 0 4px, transparent 4px 12px);
+}
+.tile.carta-6 {
+  --carta: var(--gift-6-paper); --nastro: var(--gift-6-ribbon);
+  --motivo: radial-gradient(rgba(232, 194, 126, 0.3) 1px, transparent 1.2px);
+  --motivo-size: 10px 10px;
+}
+
+/* Il nastro: una striscia verticale sopra una orizzontale, con un filo
+   d'ombra sui bordi. */
+.tile::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(80% 60% at 50% 0%, var(--accent-soft), transparent 70%);
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.18), transparent 22% 78%, rgba(0, 0, 0, 0.18)) center / var(--nastro-w) 100% no-repeat,
+    linear-gradient(var(--nastro), var(--nastro)) center / var(--nastro-w) 100% no-repeat,
+    linear-gradient(180deg, rgba(0, 0, 0, 0.18), transparent 22% 78%, rgba(0, 0, 0, 0.18)) 0 var(--nastro-y) / 100% var(--nastro-w) no-repeat,
+    linear-gradient(var(--nastro), var(--nastro)) 0 var(--nastro-y) / 100% var(--nastro-w) no-repeat;
+}
+
+/* Il fiocco, dove i due nastri si incrociano. È una sagoma (mask) riempita
+   col colore del nastro; le pieghe sono un velo più scuro sopra. */
+.tile__bow,
+.tile__bow::after {
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2040%2026%27%3E%3Cpath%20d%3D%27M20%2013C14%202%203%201%203.5%209.5C4%2016%2014%2016%2020%2013Z%27%2F%3E%3Cpath%20d%3D%27M20%2013C26%202%2037%201%2036.5%209.5C36%2016%2026%2016%2020%2013Z%27%2F%3E%3Cpath%20d%3D%27M18.5%2014L12%2025.5L15.6%2024.3L18%2026L20.6%2015Z%27%2F%3E%3Cpath%20d%3D%27M21.5%2014L28%2025.5L24.4%2024.3L22%2026L19.4%2015Z%27%2F%3E%3Crect%20x%3D%2716.5%27%20y%3D%279%27%20width%3D%277%27%20height%3D%278%27%20rx%3D%272.5%27%2F%3E%3C%2Fsvg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2040%2026%27%3E%3Cpath%20d%3D%27M20%2013C14%202%203%201%203.5%209.5C4%2016%2014%2016%2020%2013Z%27%2F%3E%3Cpath%20d%3D%27M20%2013C26%202%2037%201%2036.5%209.5C36%2016%2026%2016%2020%2013Z%27%2F%3E%3Cpath%20d%3D%27M18.5%2014L12%2025.5L15.6%2024.3L18%2026L20.6%2015Z%27%2F%3E%3Cpath%20d%3D%27M21.5%2014L28%2025.5L24.4%2024.3L22%2026L19.4%2015Z%27%2F%3E%3Crect%20x%3D%2716.5%27%20y%3D%279%27%20width%3D%277%27%20height%3D%278%27%20rx%3D%272.5%27%2F%3E%3C%2Fsvg%3E") center / contain no-repeat;
+}
+.tile__bow {
+  position: absolute;
+  left: 50%;
+  top: 32.6%;
+  width: 50%;
+  aspect-ratio: 40 / 26;
+  translate: -50% -62%;
+  background: var(--nastro);
+  pointer-events: none;
+}
+.tile__bow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.24);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2040%2026%27%3E%3Cpath%20d%3D%27M20%2013C15.5%206.5%208.5%205.5%208.5%209.5C9%2012.5%2015%2013.5%2020%2013Z%27%2F%3E%3Cpath%20d%3D%27M20%2013C24.5%206.5%2031.5%205.5%2031.5%209.5C31%2012.5%2025%2013.5%2020%2013Z%27%2F%3E%3Crect%20x%3D%2716.5%27%20y%3D%279%27%20width%3D%277%27%20height%3D%278%27%20rx%3D%272.5%27%2F%3E%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2040%2026%27%3E%3Cpath%20d%3D%27M20%2013C15.5%206.5%208.5%205.5%208.5%209.5C9%2012.5%2015%2013.5%2020%2013Z%27%2F%3E%3Cpath%20d%3D%27M20%2013C24.5%206.5%2031.5%205.5%2031.5%209.5C31%2012.5%2025%2013.5%2020%2013Z%27%2F%3E%3Crect%20x%3D%2716.5%27%20y%3D%279%27%20width%3D%277%27%20height%3D%278%27%20rx%3D%272.5%27%2F%3E%3C%2Fsvg%3E");
+}
+
+/* Riflesso che si accende al passaggio del mouse */
+.tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(90% 70% at 30% 0%, rgba(255, 255, 255, 0.24), transparent 65%);
   opacity: 0;
   transition: opacity var(--dur-base);
 }
 
 .tile:hover, .tile:focus-visible {
-  transform: translateY(-3px);
-  border-color: var(--border-strong);
-  background: var(--surface-hover);
-  box-shadow: var(--shadow-md);
-  color: var(--text);
+  transform: translateY(-3px) rotate(-1deg);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  color: var(--gift-tag-text);
 }
 .tile:hover::after, .tile:focus-visible::after { opacity: 1; }
 .tile:active { transform: translateY(-1px) scale(0.985); }
+
+/* Il cartellino col numero, un po' storto come se fosse legato al nastro */
+.tile__tag {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 58%;
+  padding: var(--space-1) var(--space-2);
+  background: var(--gift-tag);
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  rotate: -3deg;
+}
+.calendar li:nth-child(even) .tile__tag { rotate: 2deg; }
 
 .tile__num {
   font-family: var(--font-display);
   font-size: var(--text-2xl);
   line-height: 1;
+  color: var(--gift-tag-text);
 }
 
 .tile__label {
-  font-size: var(--text-xs);
-  letter-spacing: var(--tracking-wide);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--text-faint);
+  color: var(--gift-tag-label);
 }
 
-/* Giorno già aperto */
+/* Giorno già aperto: il pacchetto è scartato, niente più nastro né fiocco */
 .tile.is-open {
-  border-color: var(--accent);
-  background: linear-gradient(180deg, var(--accent-soft), transparent 70%), var(--surface);
+  box-shadow: 0 0 0 2px var(--accent-strong), 0 2px 6px rgba(0, 0, 0, 0.28);
 }
-.tile.is-open .tile__label { color: var(--accent); }
-.tile.is-open .tile__num { color: var(--accent-strong); }
+.tile.is-open::before,
+.tile.is-open .tile__bow { opacity: 0; }
+.tile.is-open .tile__label { color: var(--gift-tag-open); }
 
-/* Giorno bloccato per data (solo effetto scenico) */
+/* Giorno bloccato per data (solo effetto scenico): pacchetto in ombra */
 .tile.is-locked {
   cursor: not-allowed;
-  background: var(--surface-sunken);
-  color: var(--text-faint);
+  filter: grayscale(0.9) brightness(0.75);
+  opacity: 0.55;
   box-shadow: none;
 }
-.tile.is-locked:hover { transform: none; border-color: var(--border); background: var(--surface-sunken); box-shadow: none; }
+.tile.is-locked:hover { transform: none; box-shadow: none; }
 .tile.is-locked:hover::after { opacity: 0; }
-.tile.is-locked .tile__num { color: var(--text-faint); }
 
 .tile__seal {
   position: absolute;
-  top: var(--space-2);
+  top: var(--space-1);
   right: var(--space-2);
   font-size: var(--text-xs);
   line-height: 1;
-  opacity: 0.85;
+  color: var(--sigillo);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
-/* Casella appena sbloccata: piccolo guizzo al ritorno sulla home */
+/* Casella appena sbloccata, al ritorno sulla home: un guizzo, il nastro si
+   scioglie e il fiocco vola via. */
 @keyframes tile-pop {
   0% { transform: scale(1); }
   40% { transform: scale(1.06); }
   100% { transform: scale(1); }
 }
+@keyframes nastro-via {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: scale(1.3); }
+}
+@keyframes fiocco-via {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(-120%) rotate(-30deg) scale(0.6); }
+}
 .tile.just-opened { animation: tile-pop var(--dur-slow) var(--ease-spring); }
+.tile.just-opened::before { animation: nastro-via 700ms var(--ease-out) both; }
+.tile.just-opened .tile__bow { animation: fiocco-via 800ms var(--ease-out) both; }
 
 /* --- Riga di stato / progresso -------------------------------------------- */
 
@@ -289,12 +397,37 @@ main { flex: 1; width: 100%; }
 
 /* --- Il cancello: indovinello e risposta ---------------------------------- */
 
+/* Il riquadro ha la stessa cornice a bastoncino di zucchero delle foto
+   (variabili --frame-* in theme.css), ma dritta e con il fondo del tema,
+   così il campo e il pulsante restano leggibili nei due temi. */
 .gate {
+  position: relative;
+  margin-top: var(--space-5);
   padding: var(--space-6) clamp(var(--space-4), 4vw, var(--space-6));
-  background: var(--surface);
-  border: var(--border-width) solid var(--border);
+  border: var(--frame-border) solid transparent;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-glow);
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    repeating-linear-gradient(
+      -45deg,
+      var(--frame-stripe-a) 0 var(--frame-stripe),
+      var(--frame-stripe-b) var(--frame-stripe) calc(var(--frame-stripe) * 2)
+    ) border-box;
+  box-shadow: var(--shadow-md);
+}
+
+/* la stella in cima, come sulle foto incorniciate */
+.gate::before {
+  content: '★';
+  position: absolute;
+  top: calc(var(--frame-border) * -1);
+  left: 50%;
+  transform: translate(-50%, -55%);
+  font-size: 2.25rem;
+  line-height: 1;
+  color: var(--frame-star);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
 }
 
 .gate__kicker {
@@ -305,14 +438,54 @@ main { flex: 1; width: 100%; }
   color: var(--text-faint);
 }
 
+/* L'indovinello è scritto a mano su un cartoncino appeso con lo spago,
+   come il bigliettino di un regalo. */
 .riddle {
-  margin: 0;
-  padding: 0 0 0 var(--space-4);
-  border-left: 2px solid var(--accent);
-  font-family: var(--font-display);
-  font-size: var(--text-xl);
-  line-height: var(--leading-normal);
+  position: relative;
+  width: fit-content;
+  min-width: min(100%, 15rem);
+  max-width: 100%;
+  margin: var(--space-6) auto 0;
+  padding: var(--space-6) var(--space-6) var(--space-5);
+  font-family: var(--font-hand);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
   white-space: pre-line;
+  overflow-wrap: anywhere;
+  color: var(--riddle-ink);
+  background: var(--frame-mat);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.32);
+  rotate: -1.5deg;
+}
+
+/* il foro del cartoncino */
+.riddle::before {
+  content: '';
+  position: absolute;
+  top: var(--space-3);
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45), 0 0 0 2px var(--frame-star);
+}
+
+/* lo spago che sale dal foro */
+.riddle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - var(--space-3) - 6px);
+  width: 2px;
+  height: calc(var(--space-6) + var(--space-3) + 6px);
+  translate: -50% 0;
+  border-radius: 1px;
+  background: var(--frame-stripe-a);
 }
 
 .gate__form {
@@ -832,7 +1005,32 @@ html:has(.lightbox[open]) { overflow: hidden; }
 noscript .locked-note { display: block; margin-top: var(--space-5); }
 
 /* Casella pubblica: niente indovinello, si apre per tutti */
-.tile.is-public { border-style: dashed; border-color: var(--border-strong); }
-.tile.is-public .tile__label { color: var(--accent); }
-.tile.is-public .tile__seal { color: var(--accent); }
+.tile.is-public .tile__label { color: var(--gift-tag-public); }
 .gate > .locked-note:first-child { margin-top: 0; }
+
+/* --- Neve (neve.js) -------------------------------------------------------- */
+
+.neve {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;            /* sopra al fondo, sotto a tutto il resto */
+  pointer-events: none;
+}
+
+/* --- Stelline quando si apre una casella (day.js) ------------------------- */
+
+.stelline {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.stelline > span {
+  position: absolute;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+.stelline > span.scintilla {
+  clip-path: polygon(50% 0%, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0% 50%, 40% 40%);
+}

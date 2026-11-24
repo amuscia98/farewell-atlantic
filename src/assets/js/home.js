@@ -5,12 +5,14 @@
 // ---------------------------------------------------------------------------
 
 import { initTheme } from './theme.js';
+import { avviaNeve } from './neve.js';
 import { giorniAperti, dimenticaTutto } from './store.js';
 import { giornoBloccato, dataApertura } from './datelock.js';
 
 const config = window.AVVENTO ?? {};
 
 initTheme(document.getElementById('theme-toggle'));
+avviaNeve();
 
 const caselle = Array.from(document.querySelectorAll('[data-day]'));
 // Le caselle pubbliche non hanno indovinello: sono aperte per tutti e non

@@ -211,25 +211,30 @@ async function main() {
   }
 
   // --- La home -------------------------------------------------------------
+  // Ogni casella è un pacchetto regalo: carta (colore), fiocco e cartellino.
+  const carte = assegnaCarte(totaleGiorni);
+  const pacchetto = (day, sigillo, etichetta) =>
+    `<span class="tile__seal" aria-hidden="true">${sigillo}</span>` +
+    `<span class="tile__bow" aria-hidden="true"></span>` +
+    `<span class="tile__tag"><span class="tile__num">${day}</span>` +
+    `<span class="tile__label">${etichetta}</span></span>`;
+
   const caselle = [];
   for (let day = 1; day <= totaleGiorni; day += 1) {
     const dueC = dueCifre(day);
+    const carta = `carta-${carte[day - 1]}`;
     if (mancanti.includes(day)) {
       caselle.push(
-        `      <li><span class="tile is-locked" title="Ancora da scrivere">` +
-          `<span class="tile__seal" aria-hidden="true">·</span>` +
-          `<span class="tile__num">${day}</span>` +
-          `<span class="tile__label">in arrivo</span></span></li>`,
+        `      <li><span class="tile ${carta} is-locked" title="Ancora da scrivere">` +
+          `${pacchetto(day, '·', 'in arrivo')}</span></li>`,
       );
       continue;
     }
     const pubblico = pubblici.includes(day);
     caselle.push(
-      `      <li><a class="tile${pubblico ? ' is-public' : ''}" href="day/${dueC}.html" data-day="${day}"` +
+      `      <li><a class="tile ${carta}${pubblico ? ' is-public' : ''}" href="day/${dueC}.html" data-day="${day}"` +
         `${pubblico ? ' data-public="true"' : ''}>` +
-        `<span class="tile__seal" aria-hidden="true">${pubblico ? '○' : ''}</span>` +
-        `<span class="tile__num">${day}</span>` +
-        `<span class="tile__label">${pubblico ? 'libera' : 'dicembre'}</span></a></li>`,
+        `${pacchetto(day, pubblico ? '○' : '', pubblico ? 'libera' : 'dicembre')}</a></li>`,
     );
   }
 
@@ -290,3 +295,27 @@ main().catch((errore) => {
   console.error(`\n  Build interrotta: ${errore.message}\n`);
   process.exitCode = 1;
 });
+
+// Sceglie la carta (1…6) di ogni pacchetto. La griglia cambia numero di
+// colonne con lo schermo (da 3 a 7): per ogni casella si evitano i colori
+// della casella a sinistra e di quelle che, a seconda della larghezza,
+// finiscono subito sopra. Se non si può, vince il colore usato più lontano.
+function assegnaCarte(quante, colori = 6) {
+  const vicini = [1, 3, 4, 5, 6, 7];
+  const carte = [];
+  for (let i = 0; i < quante; i += 1) {
+    let scelta = 1;
+    let migliore = -1;
+    for (let k = 0; k < colori; k += 1) {
+      const c = ((i * 5 + k) % colori) + 1; // si parte da un colore diverso ogni volta
+      const distanza = vicini.find((v) => carte[i - v] === c) ?? Infinity;
+      if (distanza > migliore) {
+        migliore = distanza;
+        scelta = c;
+      }
+      if (distanza === Infinity) break;
+    }
+    carte.push(scelta);
+  }
+  return carte;
+}

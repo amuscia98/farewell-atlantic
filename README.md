@@ -229,7 +229,7 @@ Ciao a tutti! Ecco come funziona il calendario…
 ```
 
 Nei segnaposto è così il **giorno 1**, pensato per presentare il gioco. Sulla
-home la casella ha il bordo tratteggiato e l'etichetta "libera".
+home la casella ha l'etichetta "libera" e un pallino in alto a destra.
 
 **Il contenuto di un giorno pubblico finisce in chiaro nel repository**, immagini
 comprese: chiunque guardi il codice su GitHub lo può leggere. Mettici solo
@@ -358,6 +358,24 @@ Il tema notturno è quello di partenza; più in basso nello stesso file ci sono 
 colori del tema chiaro, usati quando il sistema è in chiaro o quando si preme
 l'interruttore in alto a destra (la scelta resta memorizzata).
 
+### Il tocco natalizio
+
+- **Neve**: pochi fiocchi che cadono sul fondo, mai sopra al testo
+  (`src/assets/js/neve.js`). Il colore è `--snow`, diverso nei due temi.
+- **Pacchetti regalo**: ogni casella è un pacco con carta, nastro, fiocco e un
+  cartellino col numero. Le sei carte sono le variabili `--gift-1-paper` …
+  `--gift-6-paper` (con i rispettivi `--gift-N-ribbon`); la build le assegna
+  in modo che due caselle vicine non abbiano la stessa. Una casella già aperta
+  perde nastro e fiocco; tornando sulla home dopo averla aperta, il nastro si
+  scioglie e il fiocco vola via.
+- **Stelline**: quando la risposta è giusta, una manciata di stelline esce dal
+  riquadro dell'indovinello. I colori sono `--sparkle-1` … `--sparkle-4`.
+- **Favicon**: un pacchetto regalo (`src/assets/favicon.svg`), più
+  `apple-touch-icon.png` per chi aggiunge il sito alla schermata Home.
+
+Chi ha chiesto al sistema di ridurre le animazioni non vede né la neve né le
+stelline.
+
 Il layout vero e proprio è in `src/assets/css/base.css`, la struttura delle
 pagine in `src/templates/`. Dopo ogni modifica serve `npm run build`, che ricopia
 tutto in `docs/`.
@@ -381,7 +399,7 @@ build/
 src/
   assets/css/theme.css   ← le variabili: colori, font, spaziature
   assets/css/base.css    layout e componenti
-  assets/js/            normalize, crypto, store, theme, home, day
+  assets/js/            normalize, crypto, store, theme, neve, home, day
   templates/            index.html e day.html
 docs/                 il sito generato — questo sì che va committato
 ```

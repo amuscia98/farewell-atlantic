@@ -69,6 +69,7 @@
   --frame-star: #e2bc7c;                /* la stella in cima */
   --frame-tilt: -2deg;                  /* inclinazione, 0deg per tenerla dritta */
   --font-hand: 'Bradley Hand', 'Segoe Print', 'Comic Sans MS', cursive;
+  --riddle-ink: #2a2018;                /* inchiostro dell'indovinello sul cartoncino */
 
   --photo-small-width: 22rem;           /* foto con #piccola */
   --lightbox-bg: rgba(5, 7, 12, 0.94);  /* fondo della foto a schermo intero */
@@ -81,7 +82,29 @@
   --carousel-dot: rgba(91, 70, 54, 0.3);        /* pallino spento (sul cartoncino) */
   --carousel-dot-active: var(--frame-stripe-a); /* pallino della foto visibile */
 
+  /* --- Pacchetti regalo del calendario ----------------------------------- */
+  /* Come la cornice, sono oggetti "fisici": stessi colori nei due temi.     */
+  /* La build dà a ogni casella una delle sei carte (carta-1 … carta-6).     */
+  --gift-1-paper: #b3262e;  --gift-1-ribbon: #e8c27e;   /* rosso, nastro oro */
+  --gift-2-paper: #1f5e3b;  --gift-2-ribbon: #d9343c;   /* verde abete, nastro rosso */
+  --gift-3-paper: #1f4c8a;  --gift-3-ribbon: #f4efe6;   /* blu Atlantic, nastro panna */
+  --gift-4-paper: #c99b52;  --gift-4-ribbon: #a3212a;   /* oro, nastro rosso scuro */
+  --gift-5-paper: #f1e7d6;  --gift-5-ribbon: #1f5e3b;   /* panna a righe, nastro verde */
+  --gift-6-paper: #6b1d2c;  --gift-6-ribbon: #e8c27e;   /* bordeaux, nastro oro */
+  --gift-tag: #fbf8f2;                  /* il cartellino col numero */
+  --gift-tag-text: #2a2018;
+  --gift-tag-label: #8a6a3a;            /* "dicembre" */
+  --gift-tag-public: #b3262e;           /* "libera" */
+  --gift-tag-open: #2f7d4f;             /* "aperta" */
+
+  /* --- Stelline quando si apre una casella ------------------------------- */
+  --sparkle-1: #e2bc7c;
+  --sparkle-2: #f5d99a;
+  --sparkle-3: #fff4d6;
+  --sparkle-4: #d9343c;
+
   /* --- Colori: tema notturno (predefinito) ----------------------------- */
+  --snow: rgba(255, 255, 255, 0.85);    /* i fiocchi di neve sul fondo */
   --bg: #0b0e14;
   --bg-glow-1: rgba(197, 154, 85, 0.16);   /* alone caldo in alto */
   --bg-glow-2: rgba(58, 92, 128, 0.18);    /* alone freddo in basso */
@@ -117,6 +140,7 @@
 @media (prefers-color-scheme: light) {
   :root:not([data-theme='dark']) {
     --bg: #f7f5f1;
+    --snow: rgba(105, 130, 165, 0.55);
     --bg-glow-1: rgba(197, 154, 85, 0.22);
     --bg-glow-2: rgba(58, 92, 128, 0.12);
     --surface: #ffffff;
@@ -149,6 +173,7 @@
 /* Scelta esplicita del visitatore: tema chiaro anche su sistema notturno. */
 :root[data-theme='light'] {
   --bg: #f7f5f1;
+  --snow: rgba(105, 130, 165, 0.55);
   --bg-glow-1: rgba(197, 154, 85, 0.22);
   --bg-glow-2: rgba(58, 92, 128, 0.12);
   --surface: #ffffff;

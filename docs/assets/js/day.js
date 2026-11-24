@@ -3,6 +3,7 @@
 // ---------------------------------------------------------------------------
 
 import { initTheme } from './theme.js';
+import { avviaNeve } from './neve.js';
 import { openDay, RispostaSbagliata } from './crypto.js';
 import { normalizeAnswer } from './normalize.js';
 import { rispostaSalvata, ricorda } from './store.js';
@@ -13,6 +14,7 @@ const day = Number(config.day);
 const pubblico = Boolean(config.public);
 
 initTheme(document.getElementById('theme-toggle'));
+avviaNeve();
 
 const gate = document.getElementById('gate');
 const form = document.getElementById('gate-form');
@@ -287,6 +289,61 @@ function nascondiGate(conAnimazione) {
   });
 }
 
+// Una manciata di stelline dorate che schizzano fuori dal riquadro
+// dell'indovinello quando la risposta è giusta. Niente per chi ha chiesto
+// meno movimento.
+function stelline(origine) {
+  if (motoRidotto || typeof Element.prototype.animate !== 'function') return;
+
+  const box = origine.getBoundingClientRect();
+  const cx = box.left + box.width / 2;
+  const cy = box.top + box.height / 2;
+  const stile = getComputedStyle(document.documentElement);
+  const colori = [1, 2, 3, 4].map((n) => stile.getPropertyValue(`--sparkle-${n}`).trim() || '#e2bc7c');
+
+  const strato = document.createElement('div');
+  strato.className = 'stelline';
+  strato.setAttribute('aria-hidden', 'true');
+  document.body.append(strato);
+
+  const QUANTE = 34;
+  let durataMassima = 0;
+  for (let i = 0; i < QUANTE; i += 1) {
+    const stella = document.createElement('span');
+    if (i % 3 === 0) stella.className = 'scintilla';
+    const lato = 8 + Math.random() * 14;
+    // il rosso solo ogni tanto, il resto oro e panna
+    const colore = i % 7 === 0 ? colori[3] : colori[i % 3];
+    Object.assign(stella.style, {
+      width: `${lato}px`,
+      height: `${lato}px`,
+      left: `${cx - lato / 2}px`,
+      top: `${cy - lato / 2}px`,
+      background: colore,
+    });
+    strato.append(stella);
+
+    const angolo = Math.random() * Math.PI * 2;
+    const distanza = 80 + Math.random() * Math.min(240, window.innerWidth * 0.45);
+    const dx = Math.cos(angolo) * distanza;
+    const dy = Math.sin(angolo) * distanza * 0.8 + 70; // un po' di gravità
+    const giro = (Math.random() < 0.5 ? -1 : 1) * (90 + Math.random() * 270);
+    const durata = 900 + Math.random() * 700;
+    durataMassima = Math.max(durataMassima, durata);
+
+    stella.animate(
+      [
+        { transform: 'translate(0, 0) scale(0.2) rotate(0deg)', opacity: 0 },
+        { opacity: 1, offset: 0.12 },
+        { opacity: 1, offset: 0.6 },
+        { transform: `translate(${dx}px, ${dy}px) scale(1) rotate(${giro}deg)`, opacity: 0 },
+      ],
+      { duration: durata, easing: 'cubic-bezier(0.2, 0.7, 0.3, 1)', fill: 'forwards' },
+    );
+  }
+  setTimeout(() => strato.remove(), durataMassima + 100);
+}
+
 async function apri(risposta, { animazione = true, salva = true } = {}) {
   const busta = await bustaPromise;
   const contenuto = await openDay(busta, risposta);
@@ -300,6 +357,7 @@ async function apri(risposta, { animazione = true, salva = true } = {}) {
     }
   }
 
+  if (animazione) stelline(gate);
   await nascondiGate(animazione);
   mostra(contenuto);
 }

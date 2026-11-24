@@ -6,7 +6,12 @@
   <title>Giorno 15 — Il calendario dell'avvento Atlantic 🎄💙</title>
   <meta name="robots" content="noindex, nofollow">
   <meta name="color-scheme" content="dark light">
+  <!-- Tema scelto con l'interruttore: va applicato prima che la pagina venga
+       disegnata, altrimenti per un istante si vede il tema del sistema (flash).
+       La chiave è la stessa di src/assets/js/theme.js. -->
+  <script>try{var t=localStorage.getItem('farewell-atlantic:tema');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
   <link rel="stylesheet" href="../assets/css/theme.css">
   <link rel="stylesheet" href="../assets/css/base.css">
 </head>
