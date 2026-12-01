@@ -23,6 +23,12 @@ export function giornoBloccato(day, dateLock, adesso = new Date()) {
   return adesso < apertura;
 }
 
+/** "il 15 dicembre 2026", ma "l'1 dicembre", "l'8 dicembre", "l'11 dicembre". */
+export function ilGiorno(day, dateLock) {
+  const articolo = [1, 8, 11].includes(day) ? "l'" : 'il ';
+  return articolo + dataApertura(day, dateLock);
+}
+
 export function dataApertura(day, dateLock) {
   return `${day} ${nomeMese(dateLock.month)} ${dateLock.year}`;
 }

@@ -1031,6 +1031,10 @@ noscript .locked-note { display: block; margin-top: var(--space-5); }
 .tile.is-public .tile__label { color: var(--gift-tag-public); }
 .gate > .locked-note:first-child { margin-top: 0; }
 
+/* Casella non ancora arrivata (blocco per data): solo l'avviso, niente
+   indovinello. La classe la mette uno script nella <head> della pagina. */
+.giorno-bloccato .gate > :not(.locked-note) { display: none; }
+
 /* --- Neve (neve.js) -------------------------------------------------------- */
 
 .neve {

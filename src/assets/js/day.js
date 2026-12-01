@@ -7,7 +7,7 @@ import { avviaNeve } from './neve.js';
 import { openDay, RispostaSbagliata } from './crypto.js';
 import { normalizeAnswer } from './normalize.js';
 import { rispostaSalvata, ricorda } from './store.js';
-import { giornoBloccato, dataApertura } from './datelock.js';
+import { giornoBloccato, ilGiorno } from './datelock.js';
 
 const config = window.AVVENTO ?? {};
 const day = Number(config.day);
@@ -377,7 +377,7 @@ function notaGiornoPubblico(testo) {
 }
 
 const testoBloccato = () =>
-  `Questa casella si apre il ${dataApertura(day, config.dateLock)}. Torna a trovarmi.`;
+  `Questa casella si apre ${ilGiorno(day, config.dateLock)}. Torna a trovarmi.`;
 
 // --- Giorno pubblico: si mostra e basta ------------------------------------
 
@@ -396,11 +396,13 @@ if (pubblico) {
 // --- Blocco per data -------------------------------------------------------
 
 else if (!salvata && giornoBloccato(day, config.dateLock)) {
-  form.hidden = true;
+  // Prima del suo giorno la casella mostra solo l'avviso: niente
+  // indovinello, suggerimento né campo della risposta.
+  for (const elemento of gate.children) elemento.hidden = true;
   const nota = document.createElement('p');
   nota.className = 'locked-note';
   nota.textContent = testoBloccato();
-  gate.append(nota);
+  gate.prepend(nota);
 } else if (salvata) {
   // Già risolto in passato: si apre da sé.
   apri(salvata, { animazione: false, salva: false }).catch(() => {

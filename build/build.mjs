@@ -44,6 +44,20 @@ function rendi(template, valori) {
   );
 }
 
+// Con il blocco per data attivo, prima del giorno giusto l'indovinello non va
+// mostrato nemmeno per un istante: questo script, nella <head>, segna la
+// pagina come "bloccata" prima che venga disegnata (vedi .giorno-bloccato in
+// base.css). Poi day.js mette al suo posto l'avviso con la data.
+function scriptBloccoData(day, dateLock) {
+  if (!dateLock?.enabled) return '';
+  const anno = Number(dateLock.year);
+  const mese = Number(dateLock.month) - 1;
+  return (
+    `  <script>if(new Date()<new Date(${anno},${mese},${day}))` +
+    `document.documentElement.classList.add('giorno-bloccato')</script>\n`
+  );
+}
+
 function bloccoCancello(giorno) {
   const noscript = (testo) =>
     `      <noscript>\n        <p class="locked-note">${testo}</p>\n      </noscript>`;
@@ -194,6 +208,7 @@ async function main() {
         day: String(day),
         badge: esc(`${day} ${nomeMese(config.dateLock?.month || 12)}`),
         gate: bloccoCancello(giorno),
+        bloccoData: scriptBloccoData(day, config.dateLock),
         footer: esc(config.site.footer || ''),
         configJson: JSON.stringify(configPagina).replace(/</g, '\\u003c'),
       }),

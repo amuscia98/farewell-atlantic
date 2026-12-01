@@ -7,7 +7,7 @@
 import { initTheme } from './theme.js';
 import { avviaNeve } from './neve.js';
 import { giorniAperti, dimenticaTutto } from './store.js';
-import { giornoBloccato, dataApertura } from './datelock.js';
+import { giornoBloccato, ilGiorno } from './datelock.js';
 
 const config = window.AVVENTO ?? {};
 
@@ -47,7 +47,7 @@ for (const casella of caselle) {
     casella.classList.remove('is-public');
     casella.classList.add('is-locked');
     casella.setAttribute('aria-disabled', 'true');
-    casella.title = `Si apre il ${dataApertura(day, config.dateLock)}`;
+    casella.title = `Si apre ${ilGiorno(day, config.dateLock)}`;
     if (etichetta) etichetta.textContent = 'non ancora';
     if (sigillo) sigillo.textContent = '·';
     casella.addEventListener('click', (evento) => evento.preventDefault());
