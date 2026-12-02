@@ -267,8 +267,18 @@ Tutto in `config.json`:
 ```
 
 - **`dateLock.enabled`** — con `true`, una casella non si apre prima del suo
-  giorno (ora locale di chi guarda). È solo un effetto scenico: il contenuto è
-  cifrato comunque, e chi ha già aperto una casella continua a vederla.
+  giorno: prima mostra solo "Questa casella si apre il …", senza indovinello.
+  Chi ha già aperto una casella continua a vederla.
+  L'ora di riferimento è quella del **server** (l'intestazione `Date` delle
+  risposte di GitHub Pages, `src/assets/js/oravera.js`), non l'orologio del
+  computer: spostare avanti la data non serve. Anzi, chi ci prova trova il
+  **carbone** 🪨: le caselle che il suo orologio "aprirebbe" diventano pacchetti
+  di carbone, con un avviso sulla home e un messaggio nella pagina del giorno
+  (oltre 10 minuti di differenza; sotto, la casella resta solo chiusa). Se il
+  server non risponde si usa l'orologio del computer.
+  Resta un limite dei siti statici: l'indovinello è nel sorgente della pagina e
+  i giorni pubblici sono in chiaro nel repository. Il contenuto cifrato,
+  invece, richiede comunque la risposta.
 - **`crypto.iterations`** — più alto è, più lento è ogni tentativo (anche quello
   legittimo: 310.000 sono circa due decimi di secondo).
 - **`crypto.compress`** — comprime prima di cifrare. Richiede un browser recente
@@ -377,6 +387,9 @@ l'interruttore in alto a destra (la scelta resta memorizzata).
 Chi ha chiesto al sistema di ridurre le animazioni non vede né la neve né le
 stelline.
 
+Chi apre gli strumenti per sviluppatori trova un saluto nella console
+(`src/assets/js/curiosi.js`).
+
 Il layout vero e proprio è in `src/assets/css/base.css`, la struttura delle
 pagine in `src/templates/`. Dopo ogni modifica serve `npm run build`, che ricopia
 tutto in `docs/`.
@@ -400,7 +413,7 @@ build/
 src/
   assets/css/theme.css   ← le variabili: colori, font, spaziature
   assets/css/base.css    layout e componenti
-  assets/js/            normalize, crypto, store, theme, neve, home, day
+  assets/js/            normalize, crypto, store, theme, neve, oravera, curiosi, home, day
   templates/            index.html e day.html
 docs/                 il sito generato — questo sì che va committato
 ```

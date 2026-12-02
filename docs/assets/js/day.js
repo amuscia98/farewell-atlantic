@@ -7,7 +7,9 @@ import { avviaNeve } from './neve.js';
 import { openDay, RispostaSbagliata } from './crypto.js';
 import { normalizeAnswer } from './normalize.js';
 import { rispostaSalvata, ricorda } from './store.js';
-import { giornoBloccato, ilGiorno } from './datelock.js';
+import { statoCasella, ilGiorno, ilGiornoDi } from './datelock.js';
+import { oraVera } from './oravera.js';
+import { salutaCuriosi } from './curiosi.js';
 
 const config = window.AVVENTO ?? {};
 const day = Number(config.day);
@@ -15,6 +17,7 @@ const pubblico = Boolean(config.public);
 
 initTheme(document.getElementById('theme-toggle'));
 avviaNeve();
+salutaCuriosi();
 
 const gate = document.getElementById('gate');
 const form = document.getElementById('gate-form');
@@ -364,53 +367,91 @@ async function apri(risposta, { animazione = true, salva = true } = {}) {
 
 // --- Avvisi al posto del contenuto -----------------------------------------
 
-function notaGiornoPubblico(testo) {
-  // I giorni pubblici non hanno il riquadro dell'indovinello: lo creiamo
-  // solo per mostrare un avviso.
-  const riquadro = document.createElement('section');
-  riquadro.className = 'gate';
+// Mette un avviso al posto dell'indovinello. I giorni pubblici non hanno il
+// riquadro: lo si crea apposta.
+function mostraAvviso(nodo) {
+  let riquadro = gate;
+  if (!riquadro) {
+    riquadro = document.createElement('section');
+    riquadro.className = 'gate';
+    reveal.before(riquadro);
+  }
+  for (const elemento of riquadro.children) elemento.hidden = true;
+  riquadro.prepend(nodo);
+}
+
+function avviso(testo) {
   const nota = document.createElement('p');
   nota.className = 'locked-note';
   nota.textContent = testo;
-  riquadro.append(nota);
-  reveal.before(riquadro);
+  return nota;
 }
 
 const testoBloccato = () =>
   `Questa casella si apre ${ilGiorno(day, config.dateLock)}. Torna a trovarmi.`;
 
-// --- Giorno pubblico: si mostra e basta ------------------------------------
+// Easter egg per chi ha spostato avanti la data del computer.
+function carbone(ora) {
+  const box = document.createElement('div');
+  box.className = 'locked-note carbone';
+  const righe = [
+    ['carbone__sasso', '🪨'],
+    ['carbone__titolo', 'Bel tentativo, viaggiatore nel tempo 🕰️'],
+    [
+      '',
+      `Il tuo computer dice che è ${ilGiornoDi(new Date())}, ma il calendario sa che oggi è ` +
+        `${ilGiornoDi(ora.adesso())}. Questa casella si apre ${ilGiorno(day, config.dateLock)}, quello vero.`,
+    ],
+    ['', "Nel frattempo eccoti il carbone che ti sei meritato. Rimetti a posto l'orologio e torna a trovarmi 😉"],
+  ];
+  for (const [classe, testo] of righe) {
+    const p = document.createElement('p');
+    if (classe) p.className = classe;
+    if (classe === 'carbone__sasso') p.setAttribute('aria-hidden', 'true');
+    p.textContent = testo;
+    box.append(p);
+  }
+  return box;
+}
+
+// --- Si decide cosa mostrare ----------------------------------------------
+// Con il blocco per data attivo si aspetta l'ora del server (pochi decimi di
+// secondo): fino ad allora il riquadro resta nascosto (classe
+// "giorno-in-verifica", messa da uno script nella <head>).
 
 const salvata = pubblico ? null : rispostaSalvata(day);
 
-if (pubblico) {
-  if (giornoBloccato(day, config.dateLock)) {
-    notaGiornoPubblico(testoBloccato());
-  } else {
-    bustaPromise
-      .then((busta) => mostra(busta.content ?? {}))
-      .catch((errore) => notaGiornoPubblico(`Qualcosa non va: ${errore.message}`));
+async function decidi() {
+  const ora = config.dateLock?.enabled ? await oraVera() : null;
+  const stato = statoCasella(day, config.dateLock, ora);
+
+  if (pubblico) {
+    if (stato === 'carbone') mostraAvviso(carbone(ora));
+    else if (stato === 'bloccata') mostraAvviso(avviso(testoBloccato()));
+    else {
+      bustaPromise
+        .then((busta) => mostra(busta.content ?? {}))
+        .catch((errore) => mostraAvviso(avviso(`Qualcosa non va: ${errore.message}`)));
+    }
+  } else if (salvata) {
+    // Già risolto in passato: si apre da sé.
+    apri(salvata, { animazione: false, salva: false }).catch(() => {
+      // La risposta memorizzata non va più bene (contenuto rigenerato con
+      // un'altra risposta): si torna a chiedere l'indovinello.
+      gate.hidden = false;
+    });
+  } else if (stato === 'carbone') {
+    mostraAvviso(carbone(ora));
+  } else if (stato === 'bloccata') {
+    // Prima del suo giorno la casella mostra solo l'avviso: niente
+    // indovinello, suggerimento né campo della risposta.
+    mostraAvviso(avviso(testoBloccato()));
   }
+
+  document.documentElement.classList.remove('giorno-in-verifica');
 }
 
-// --- Blocco per data -------------------------------------------------------
-
-else if (!salvata && giornoBloccato(day, config.dateLock)) {
-  // Prima del suo giorno la casella mostra solo l'avviso: niente
-  // indovinello, suggerimento né campo della risposta.
-  for (const elemento of gate.children) elemento.hidden = true;
-  const nota = document.createElement('p');
-  nota.className = 'locked-note';
-  nota.textContent = testoBloccato();
-  gate.prepend(nota);
-} else if (salvata) {
-  // Già risolto in passato: si apre da sé.
-  apri(salvata, { animazione: false, salva: false }).catch(() => {
-    // La risposta memorizzata non va più bene (contenuto rigenerato con
-    // un'altra risposta): si torna a chiedere l'indovinello.
-    gate.hidden = false;
-  });
-}
+decidi();
 
 // --- Invio della risposta --------------------------------------------------
 
@@ -428,6 +469,11 @@ form?.addEventListener('submit', async (evento) => {
   bottone.disabled = true;
   messaggio.classList.remove('is-error');
   messaggio.textContent = 'Apro…';
+
+  if (config.dateLock?.enabled && statoCasella(day, config.dateLock, await oraVera()) !== 'libera') {
+    window.location.reload();
+    return;
+  }
 
   try {
     await apri(risposta);

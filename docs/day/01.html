@@ -10,7 +10,7 @@
        disegnata, altrimenti per un istante si vede il tema del sistema (flash).
        La chiave è la stessa di src/assets/js/theme.js. -->
   <script>try{var t=localStorage.getItem('farewell-atlantic:tema');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
-  <script>if(new Date()<new Date(2026,11,1))document.documentElement.classList.add('giorno-bloccato')</script>
+  <script>document.documentElement.classList.add('giorno-in-verifica')</script>
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
   <link rel="stylesheet" href="../assets/css/theme.css">
@@ -35,7 +35,7 @@
 
   <footer class="site-foot">Fatto con affetto — Alessandro</footer>
 
-  <script type="application/json" id="avvento-config">{"day":1,"dataUrl":"../data/day-01.json","public":true,"dateLock":{"enabled":true,"year":2026,"month":12,"note":"Se enabled è true, una casella non si apre prima del suo giorno (ora locale del visitatore). È solo un effetto scenico: il contenuto resta cifrato in ogni caso."},"siteTitle":"Il calendario dell'avvento Atlantic 🎄💙","navHtml":"\u003ca href=\"../index.html\">Calendario\u003c/a> · \u003ca href=\"02.html\">Giorno 2 →\u003c/a>"}</script>
+  <script type="application/json" id="avvento-config">{"day":1,"dataUrl":"../data/day-01.json","public":true,"dateLock":{"enabled":true,"year":2026,"month":12,"note":"Se enabled è true, una casella non si apre prima del suo giorno. L'ora di riferimento è quella del server (GitHub Pages), non l'orologio del visitatore: chi sposta avanti la data trova il carbone. Il contenuto cifrato resta protetto dalla risposta in ogni caso."},"siteTitle":"Il calendario dell'avvento Atlantic 🎄💙","navHtml":"\u003ca href=\"../index.html\">Calendario\u003c/a> · \u003ca href=\"02.html\">Giorno 2 →\u003c/a>"}</script>
   <script type="module">
     window.AVVENTO = JSON.parse(document.getElementById('avvento-config').textContent);
   </script>

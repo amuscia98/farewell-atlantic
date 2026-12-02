@@ -44,18 +44,13 @@ function rendi(template, valori) {
   );
 }
 
-// Con il blocco per data attivo, prima del giorno giusto l'indovinello non va
-// mostrato nemmeno per un istante: questo script, nella <head>, segna la
-// pagina come "bloccata" prima che venga disegnata (vedi .giorno-bloccato in
-// base.css). Poi day.js mette al suo posto l'avviso con la data.
-function scriptBloccoData(day, dateLock) {
+// Con il blocco per data attivo, l'indovinello non va mostrato finché day.js
+// non ha chiesto l'ora al server e deciso se la casella è aperta: questo
+// script, nella <head>, nasconde il riquadro prima che la pagina venga
+// disegnata (vedi .giorno-in-verifica in base.css).
+function scriptBloccoData(dateLock) {
   if (!dateLock?.enabled) return '';
-  const anno = Number(dateLock.year);
-  const mese = Number(dateLock.month) - 1;
-  return (
-    `  <script>if(new Date()<new Date(${anno},${mese},${day}))` +
-    `document.documentElement.classList.add('giorno-bloccato')</script>\n`
-  );
+  return "  <script>document.documentElement.classList.add('giorno-in-verifica')</script>\n";
 }
 
 function bloccoCancello(giorno) {
@@ -208,7 +203,7 @@ async function main() {
         day: String(day),
         badge: esc(`${day} ${nomeMese(config.dateLock?.month || 12)}`),
         gate: bloccoCancello(giorno),
-        bloccoData: scriptBloccoData(day, config.dateLock),
+        bloccoData: scriptBloccoData(config.dateLock),
         footer: esc(config.site.footer || ''),
         configJson: JSON.stringify(configPagina).replace(/</g, '\\u003c'),
       }),
@@ -296,7 +291,7 @@ async function main() {
   }
   console.log(`  PBKDF2: ${Number(config.crypto.iterations) || 310000} iterazioni` +
     `, compressione: ${config.crypto.compress !== false ? 'sì' : 'no'}`);
-  console.log(`  blocco per data: ${config.dateLock?.enabled ? `sì (dicembre ${config.dateLock.year})` : 'no'}`);
+  console.log(`  blocco per data: ${config.dateLock?.enabled ? `sì (${nomeMese(config.dateLock.month)} ${config.dateLock.year})` : 'no'}`);
 
   if (avvisi.length) {
     console.log('\n  Da tenere presente:');

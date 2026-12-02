@@ -1031,9 +1031,55 @@ noscript .locked-note { display: block; margin-top: var(--space-5); }
 .tile.is-public .tile__label { color: var(--gift-tag-public); }
 .gate > .locked-note:first-child { margin-top: 0; }
 
-/* Casella non ancora arrivata (blocco per data): solo l'avviso, niente
-   indovinello. La classe la mette uno script nella <head> della pagina. */
-.giorno-bloccato .gate > :not(.locked-note) { display: none; }
+/* Blocco per data: finché non è arrivata l'ora del server il riquadro resta
+   nascosto. La classe la mette uno script nella <head> della pagina e la
+   toglie day.js. */
+.giorno-in-verifica .gate { visibility: hidden; }
+
+/* --- Il carbone: easter egg per chi sposta avanti la data ------------------ */
+
+.carbone { text-align: center; }
+.carbone p { margin: 0; }
+.carbone p + p { margin-top: var(--space-3); }
+.carbone__sasso {
+  font-size: 3.5rem;
+  line-height: 1;
+  animation: dondola 2.4s ease-in-out infinite;
+}
+.carbone__titolo {
+  font-family: var(--font-hand);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--text);
+}
+@keyframes dondola {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg) translateY(-3px); }
+}
+
+/* Casella di carbone nel calendario: carta nera, nastro grigio */
+.tile.is-carbone {
+  --carta: #24252a;
+  --nastro: #5a5d66;
+  --sigillo: #c9ccd3;
+  --motivo:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.09) 0 2.5px, transparent 3.5px),
+    radial-gradient(circle at 70% 60%, rgba(0, 0, 0, 0.35) 0 4px, transparent 5px);
+  --motivo-size: 16px 16px, 23px 23px;
+}
+.tile.is-carbone .tile__label { color: #4a4d55; }
+.tile.is-carbone .tile__seal { text-shadow: none; }
+
+.avviso-carbone {
+  max-width: 34rem;
+  margin: var(--space-5) auto 0;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--text);
+  background: var(--surface);
+  border: var(--border-width) dashed var(--border-strong);
+  border-radius: var(--radius-md);
+}
 
 /* --- Neve (neve.js) -------------------------------------------------------- */
 
